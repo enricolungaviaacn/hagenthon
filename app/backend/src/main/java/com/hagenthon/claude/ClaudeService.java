@@ -11,20 +11,21 @@ import org.springframework.web.client.RestClient;
 
 import java.util.*;
 
-@Service
+// Questa classe non è più registrata come bean Spring.
+// L'estrazione dati avviene tramite DocumentDataExtractor (PDFBox + pattern matching).
 @Slf4j
 public class ClaudeService {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${app.anthropic.api-key}")
+    @Value("${app.anthropic.api-key:disabled}")
     private String apiKey;
 
-    @Value("${app.anthropic.model}")
+    @Value("${app.anthropic.model:disabled}")
     private String model;
 
-    public ClaudeService(@Value("${app.anthropic.base-url}") String baseUrl,
+    public ClaudeService(@Value("${app.anthropic.base-url:https://api.anthropic.com}") String baseUrl,
                          ObjectMapper objectMapper) {
         this.restClient = RestClient.builder().baseUrl(baseUrl).build();
         this.objectMapper = objectMapper;

@@ -2,9 +2,9 @@ package com.hagenthon.session730;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hagenthon.claude.ClaudeService;
 import com.hagenthon.document.UploadedDocument;
 import com.hagenthon.document.UploadedDocumentRepository;
+import com.hagenthon.pdf.DocumentDataExtractor;
 import com.hagenthon.pdf.PdfAnalyzerService;
 import com.hagenthon.session730.Session730.SessionStatus;
 import com.hagenthon.session730.dto.*;
@@ -31,7 +31,7 @@ public class Session730Service {
     private final Session730Repository sessionRepository;
     private final UploadedDocumentRepository documentRepository;
     private final PdfAnalyzerService pdfAnalyzerService;
-    private final ClaudeService claudeService;
+    private final DocumentDataExtractor documentDataExtractor;
     private final ObjectMapper objectMapper;
 
     @Value("${app.upload.dir}")
@@ -43,7 +43,7 @@ public class Session730Service {
         String filePath = saveFile(user.getId(), file);
         String pdfText = pdfAnalyzerService.extractText(filePath);
         log.debug("uploadPdf: estratto testo di {} caratteri dal PDF", pdfText.length());
-        Map<String, String> analyzed = claudeService.analyzePdf730(pdfText);
+        Map<String, String> analyzed = documentDataExtractor.analyzePdf730(pdfText);
 
         Session730 session = new Session730();
         session.setUser(user);
@@ -126,7 +126,7 @@ public class Session730Service {
             docText = "Documento caricato: " + file.getOriginalFilename();
         }
 
-        String extractedValue = claudeService.extractValueFromDocument(
+        String extractedValue = documentDataExtractor.extractValueFromDocument(
                 docText,
                 step.getDisplayName(),
                 step.getDocumentRequired() != null ? step.getDocumentRequired() : "documento generico"

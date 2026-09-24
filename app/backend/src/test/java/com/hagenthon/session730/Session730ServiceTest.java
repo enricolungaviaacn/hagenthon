@@ -1,9 +1,9 @@
 package com.hagenthon.session730;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hagenthon.claude.ClaudeService;
 import com.hagenthon.document.UploadedDocument;
 import com.hagenthon.document.UploadedDocumentRepository;
+import com.hagenthon.pdf.DocumentDataExtractor;
 import com.hagenthon.pdf.PdfAnalyzerService;
 import com.hagenthon.session730.Session730.SessionStatus;
 import com.hagenthon.session730.dto.*;
@@ -35,7 +35,7 @@ class Session730ServiceTest {
     @Mock private Session730Repository sessionRepository;
     @Mock private UploadedDocumentRepository documentRepository;
     @Mock private PdfAnalyzerService pdfAnalyzerService;
-    @Mock private ClaudeService claudeService;
+    @Mock private DocumentDataExtractor documentDataExtractor;
 
     private Session730Service session730Service;
 
@@ -43,7 +43,7 @@ class Session730ServiceTest {
     void setUp() {
         ObjectMapper realObjectMapper = new ObjectMapper();
         session730Service = new Session730Service(
-                sessionRepository, documentRepository, pdfAnalyzerService, claudeService, realObjectMapper);
+                sessionRepository, documentRepository, pdfAnalyzerService, documentDataExtractor, realObjectMapper);
         ReflectionTestUtils.setField(session730Service, "uploadDir",
                 System.getProperty("java.io.tmpdir") + "/hagenthon-test");
     }
@@ -58,7 +58,7 @@ class Session730ServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "modello730.pdf", "application/pdf", "PDF content".getBytes());
         when(pdfAnalyzerService.extractText(any())).thenReturn("testo estratto dal pdf");
-        when(claudeService.analyzePdf730(anyString())).thenReturn(Map.of("PENSIONE_INPS", "1000.00"));
+        when(documentDataExtractor.analyzePdf730(anyString())).thenReturn(Map.of("PENSIONE_INPS", "1000.00"));
         when(sessionRepository.save(any())).thenAnswer(inv -> {
             Session730 s = inv.getArgument(0);
             s.setId(UUID.randomUUID());
@@ -165,7 +165,7 @@ class Session730ServiceTest {
                 "file", "cu.pdf", "application/pdf", "Contenuto documento CU".getBytes());
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
         when(pdfAnalyzerService.extractText(any())).thenReturn("testo del documento");
-        when(claudeService.extractValueFromDocument(anyString(), anyString(), anyString()))
+        when(documentDataExtractor.extractValueFromDocument(anyString(), anyString(), anyString()))
                 .thenReturn("1500.00");
         when(documentRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
