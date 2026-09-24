@@ -61,17 +61,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/auto-open-pr.sh"
-          }
-        ]
-      }
     ]
   },
   "permissions": {
@@ -86,7 +75,6 @@
       "Bash(git switch*)",
       "Bash(git pull*)",
       "Bash(git fetch*)",
-      "Bash(gh*)",
       "Bash(mvn*)",
       "Bash(./mvnw*)",
       "Bash(npm*)",
