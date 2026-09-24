@@ -72,6 +72,11 @@ I funzionali possono solo visualizzare. L'hook check-db-access blocca le modific
 3. Evidenza validazione (prima/dopo)
 4. Nota processo AI
 
+## Prima di ogni sessione di sviluppo
+1. Esegui `git pull` sul branch corrente per allinearti all'ultimo stato remoto.
+2. Verifica se ci sono nuovi requisiti: controlla issue aperte, commenti su PR, e aggiornamenti in questo CLAUDE.md.
+3. Solo dopo inizia a sviluppare.
+
 ## Note operative
 - Stato sessione JSON: voce_corrente, documenti_caricati, risultati, tentativi_per_voce
 - Model tiering: orchestratore = Sonnet, subagenti = Haiku
