@@ -1,69 +1,119 @@
 # 730 Facile
 
 ## Contesto del progetto
-Assistente web che guida Maria (72 anni, pensionata) voce per voce attraverso il 730 precompilato INPS,
-spiegando ogni campo in linguaggio semplice, chiedendo i documenti giusti, confrontando i valori.
+Applicazione web che guida Maria (72 anni, pensionata) passo per passo nella verifica del 730 precompilato,
+spiegando ogni campo in linguaggio semplice, chiedendo i documenti di supporto e confrontando i valori.
 
 ## Stack tecnico
-- Frontend: React + PDF.js (highlight sezione corrente nel documento)
-- Backend: Java Spring Boot
-- Analisi documenti: claude-haiku-4-5-20251001 per subagenti, claude-sonnet-4-6 per orchestratore
-- PDF parsing: Apache PDFBox
-- API key: variabile d'ambiente `ANTHROPIC_API_KEY` — mai in chiaro nel codice
+- Frontend: React 18 + TypeScript + Vite (porta 3000)
+- Backend: Java 21 + Spring Boot 3.2.5 (porta 8080)
+- Database: H2 su file — utenti, sessioni, documenti caricati
+- Autenticazione: JWT con scadenza 24h, password con BCrypt
+- Estrazione dati: Apache PDFBox + regole di pattern matching, **nessuna dipendenza da API esterne a runtime**
 
-## Architettura
-Orchestratore (Sonnet): gestisce flusso, coordina subagenti, mantiene stato JSON.
-- pdf-analyzer (Haiku): estrae testo e coordinate delle 5 voci, posizioni per PDF.js
-- document-comparator (Haiku): confronta valore utente vs precompilato, risponde OK/ATTENZIONE
-- memory-manager (Haiku): traccia documenti caricati, evita duplicati, costruisce riepilogo
+Il frontend chiama sempre URL relativi (`/api/...`): il proxy Vite instrada verso la porta 8080.
 
-## Le 5 voci gestite
-1. Pensione INPS -> CU (Certificazione Unica)
-2. Spese mediche -> Scontrini/fatture o precompilato SSN
-3. Interessi sul mutuo -> Certificato annuale banca
-4. Detrazione familiari -> Documento identità familiare
-5. Addizionale comunale/regionale -> Automatica, nessun documento
+## Logica di verifica (il cuore del prodotto)
 
-## Regole comportamento assistente
-- Tono: semplice, paziente, mai tecnico
-- Max 3 tentativi per voce, poi escalation CAF (HITL obbligatorio)
-- Disclaimer obbligatorio all'avvio: suggerire CAF per dubbi importanti
-- Mai cifre definitive: sempre "sembra corrispondere" o "c'è una differenza"
-- Feature distintiva: pulsante "Mostra nel documento" — PDF con sezione in giallo
-- Persistenza: stato sessione salvato su JSON
+Per ogni campo il sistema fa tre cose:
+1. Estrae il valore dal **730 caricato**
+2. Ottiene il valore dall'**utente** — digitato a mano oppure estratto dal documento di supporto
+3. **Confronta**: se coincidono l'esito è `OK`; se divergono è `MISMATCH` e l'utente sceglie quale valore è corretto
 
-## Branch workflow (enforced da hook)
-Ogni nuova modifica parte da un branch di tipo feature/nome-modifica.
-Push e merge diretti su main, stable, test sono bloccati dall'hook check-branch.
-Il merge avviene sempre tramite Pull Request su GitHub.
+Gli esiti possibili sono `OK`, `MISMATCH`, `PENDING`.
 
-Flusso di promozione: feature -> PR su test -> PR su stable -> PR su main (release)
+## I 12 step
 
-## Ambienti
-- main: Release/Produzione
-- stable: Staging — integrazione funzionalità verificate
-- test: Test — prima validazione ogni feature
-- feature/X: Sviluppo attivo locale
+**Anagrafica (`MANUAL_ENTRY`)** — l'utente digita, il sistema confronta col frontespizio del 730:
 
-## Accesso database
-Solo gli sviluppatori in .claude/developers.txt possono modificare il DB.
-I funzionali possono solo visualizzare. L'hook check-db-access blocca le modifiche non autorizzate.
+| # | Step | Dove sta nel 730 |
+|---|---|---|
+| 0 | Nome e cognome | Frontespizio |
+| 1 | Data di nascita | Frontespizio |
+| 2 | Codice fiscale | Frontespizio |
+| 3 | Sesso | Frontespizio |
+| 4 | Comune di nascita | Frontespizio |
+| 5 | Domicilio (via, CAP, comune, provincia) | Frontespizio |
+
+**Voci fiscali (`DOCUMENT_UPLOAD`)** — l'utente carica un documento, il sistema ne estrae il valore e lo confronta:
+
+| # | Step | Documento | Quadro |
+|---|---|---|---|
+| 6 | Pensione INPS | Certificazione Unica | RC1 |
+| 7 | Reddito lavoro dipendente | CU del datore di lavoro | RC1 |
+| 8 | Spese mediche | Fatture, scontrini | RP1 |
+| 9 | Interessi mutuo | Certificato della banca | RP7 |
+| 10 | Familiari a carico | Documento d'identità | RC6 |
+
+**Automatico (`AUTOMATIC`)**:
+
+| # | Step | Note |
+|---|---|---|
+| 11 | Addizionale regionale e comunale | Calcolata, nessun documento richiesto |
+
+## Documenti di prova
+
+In `test-data/` ci sono tre fac-simile coerenti tra loro, tutti intestati a ROSSI MARIA (`RSSMRA53C54H501Z`,
+nata il 14/03/1953 a Roma): il 730 precompilato, la CU INPS e una fattura medica. Pensione `18.500,00` e
+spese mediche `1.200,00` combaciano tra 730 e documenti, quindi il confronto dà `OK`.
+
+Il testo già estratto da questi PDF è disponibile come fixture in
+`app/backend/src/test/resources/fixtures/` — i test devono usare quelle, non stringhe inventate.
+
+**Questi file non devono mai finire su `main` o `stable`** (hook `check-test-data`).
+
+### Insidie note nell'estrazione
+Chi tocca le regex di `DocumentDataExtractor` deve tenerne conto:
+- Il 730 mette il valore **sulla riga sotto** l'etichetta; la CU affianca gruppi di etichette e gruppi di valori
+- Ci sono **più date** e **più codici fiscali** per documento: ancorare sempre all'etichetta giusta, mai prendere la prima occorrenza
+- Il simbolo dell'euro esce corrotto dall'estrazione: **nessuna regex deve dipendere dalla valuta** o dalle lettere accentate
+- Nella fattura medica ci sono otto importi: solo quello dopo "TOTALE DOVUTO" è quello buono
+
+## Regole di comportamento verso l'utente
+- Tono semplice e paziente, mai tecnico
+- Mai cifre presentate come definitive: "sembra corrispondere" oppure "c'è una differenza"
+- Disclaimer all'avvio: per i dubbi importanti rivolgersi a un CAF
+- Font minimo 16px per il testo, 20px per i titoli; pulsanti alti almeno 44px
+- Messaggi di errore in italiano semplice, senza gergo
+
+## Ciclo di sviluppo
+
+Gli agenti lavorano in tre fasi, in quest'ordine e senza sovrapposizioni:
+
+1. **Sviluppo** — `backend-developer` e `frontend-developer`, in parallelo. Si aspetta che **tutti** abbiano chiuso
+2. **Test** — code review, poi `junit-tester` **una volta sola** su tutti i commit della fase
+3. **Build** — solo a test verdi: build di backend e frontend, poi avvio del backend sulla 8080
+
+Il coordinamento è di `agent-lead`, che è l'unico punto d'ingresso. Il motivo della sequenza: un tester che
+gira su codice ancora in scrittura produce fallimenti falsi, e due processi Maven sulla stessa cartella
+`target/` si corrompono a vicenda.
+
+### Agenti attivi
+`agent-lead` (coordinamento) · `backend-developer` · `frontend-developer` · `junit-tester` ·
+`requirements-definer` · `requirement-analyzer` · `ux-tester-elderly`
+
+## Branch
+- `main` — release
+- `stable` — integrazione di funzionalità verificate
+- `test` — prima validazione
+- `feature/X` — sviluppo attivo
+
+Promozione: `feature` → `test` → `stable` → `main`.
 
 ## Hook attivi (.claude/settings.json)
-- check-read-path: blocca lettura file fuori dal repository
-- check-branch: blocca push/merge diretti su main/stable/test
-- check-db-access: blocca modifiche DB per utenti non in developers.txt
+Registrati sia sul tool Bash sia su PowerShell — altrimenti basta cambiare shell per aggirarli.
 
-## Prima di ogni sessione di sviluppo
-1. Esegui `git pull` sul branch corrente per allinearti all'ultimo stato remoto.
-2. Verifica se ci sono nuovi requisiti: controlla issue aperte, commenti su PR, e aggiornamenti in questo CLAUDE.md.
-3. Solo dopo inizia a sviluppare.
+- `check-read-path` — blocca letture fuori dal repository
+- `check-branch` — blocca push e merge diretti su main, stable, test
+- `check-db-access` — blocca modifiche al DB per chi non è in `.claude/developers.txt`
+- `check-agent-role` — richiede il marker `.claude/active-agent` per scrivere in `app/`
+- `check-test-data` — tiene i file di prova fuori da main e stable
 
 ## Note operative
-- Stato sessione JSON: voce_corrente, documenti_caricati, risultati, tentativi_per_voce
-- Model tiering: orchestratore = Sonnet, subagenti = Haiku
-- Logging obbligatorio: `@Slf4j` su ogni Service e Controller — nessun System.out.println
-- Nessun commento al codice se auto-esplicativo
+- Logging obbligatorio: `@Slf4j` su ogni `@Service` e `@RestController` — mai `System.out.println`
+- Mai loggare password, token JWT o chiavi: usare `[REDACTED]`
+- Nessun commento al codice se è auto-esplicativo
+- Mai indebolire l'asserzione di un test per farlo passare: se fallisce, il problema è nel codice
 
 ## Regola linguaggio (obbligatoria per tutti gli agenti)
 Nessun agente può mai usare o citare: AI, artificiale, intelligenza artificiale, giuria, gara, hackathon, contest, competizione — né in output verso l'utente finale né in commenti nel codice.

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>730 Precompilato 2025 – Fac Simile</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 9pt; color: #000; background: #fff; }
+  .page { width: 210mm; margin: 0 auto; padding: 10mm; }
+  h1 { font-size: 11pt; text-align: center; border: 2px solid #000; padding: 4px; margin-bottom: 6px; }
+  h2 { font-size: 9pt; background: #000; color: #fff; padding: 3px 6px; margin: 8px 0 4px; }
+  h3 { font-size: 9pt; background: #ccc; padding: 2px 6px; margin: 6px 0 3px; }
+  .header-box { border: 1px solid #000; padding: 6px; margin-bottom: 8px; }
+  .header-box table { width: 100%; border-collapse: collapse; }
+  .header-box td { padding: 2px 4px; font-size: 8.5pt; }
+  .label { font-size: 7pt; color: #555; display: block; }
+  .value { font-weight: bold; border-bottom: 1px solid #999; min-height: 14px; display: block; padding: 1px 2px; }
+  .section { border: 1px solid #000; margin-bottom: 8px; }
+  .section-inner { padding: 6px; }
+  .row { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-end; }
+  .field { flex: 1; }
+  .field-sm { flex: 0.4; }
+  .field-lg { flex: 2; }
+  .codice { font-size: 7pt; color: #888; margin-right: 4px; }
+  .importo { text-align: right; }
+  .nota { font-size: 7pt; color: #555; font-style: italic; margin-top: 4px; }
+  .firma-box { border: 1px solid #000; padding: 6px; margin-top: 10px; display: flex; gap: 20px; }
+  .firma-box .field { border-bottom: 1px solid #000; min-height: 30px; }
+  table.griglia { width: 100%; border-collapse: collapse; }
+  table.griglia td, table.griglia th { border: 1px solid #999; padding: 3px 5px; font-size: 8.5pt; }
+  table.griglia th { background: #eee; font-weight: bold; text-align: left; }
+  .bar { background: #000; color: #fff; font-size: 8pt; font-weight: bold; padding: 2px 6px; margin: 4px 0; }
+  .rigo { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
+  .rigo .cod { font-weight: bold; font-size: 8pt; width: 36px; flex-shrink: 0; }
+  .rigo .desc { flex: 1; font-size: 8pt; }
+  .rigo .imp { border: 1px solid #000; width: 110px; text-align: right; padding: 1px 3px; font-size: 8.5pt; flex-shrink: 0; }
+  @media print {
+    body { font-size: 9pt; }
+    .page { padding: 8mm; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print" style="background:#fffbe6;border:1px solid #e6c200;padding:10px;margin:10px;font-family:Arial;font-size:12px">
+  ⚠️ <strong>Fac simile per test — dati fittizi.</strong>
+  Per salvare come PDF: <strong>Ctrl+P → Salva come PDF</strong> (imposta margini minimi, scala 90%).
+</div>
+
+<div class="page">
+
+  <h1>MODELLO 730 – DICHIARAZIONE DEI REDDITI 2025<br>
+  <span style="font-size:9pt;font-weight:normal">(anno d'imposta 2024) — Precompilato dall'Agenzia delle Entrate</span></h1>
+
+  <!-- FRONTESPIZIO -->
+  <div class="header-box">
+    <div class="bar">FRONTESPIZIO – DATI DEL DICHIARANTE</div>
+    <table>
+      <tr>
+        <td style="width:50%">
+          <span class="label">Cognome e nome</span>
+          <span class="value">ROSSI MARIA</span>
+        </td>
+        <td style="width:25%">
+          <span class="label">Data di nascita</span>
+          <span class="value">14/03/1953</span>
+        </td>
+        <td style="width:25%">
+          <span class="label">Sesso</span>
+          <span class="value">F</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Codice fiscale</span>
+          <span class="value">RSSMRA53C54H501Z</span>
+        </td>
+        <td>
+          <span class="label">Comune di nascita</span>
+          <span class="value">ROMA</span>
+        </td>
+        <td>
+          <span class="label">Provincia</span>
+          <span class="value">RM</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <span class="label">Domicilio fiscale al 1° gennaio 2024 – Via e numero</span>
+          <span class="value">VIA APPIA NUOVA, 42</span>
+        </td>
+        <td>
+          <span class="label">CAP</span>
+          <span class="value">00183</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="label">Comune</span>
+          <span class="value">ROMA</span>
+        </td>
+        <td>
+          <span class="label">Provincia</span>
+          <span class="value">RM</span>
+        </td>
+        <td>
+          <span class="label">Codice comune</span>
+          <span class="value">H501</span>
+        </td>
+      </tr>
+    </table>
+    <div class="nota" style="margin-top:6px">
+      Dichiarazione predisposta dall'Agenzia delle Entrate sulla base delle informazioni disponibili al 30/04/2025.
+      Il contribuente può accettare, modificare o integrare i dati precompilati.
+    </div>
+  </div>
+
+  <!-- SEZIONE RC – REDDITI DI LAVORO DIPENDENTE E ASSIMILATI -->
+  <h2>QUADRO RC – Redditi di lavoro dipendente e assimilati (Pensioni)</h2>
+  <div class="section">
+    <div class="section-inner">
+      <div class="bar">Dati del sostituto d'imposta (INPS)</div>
+      <div class="row" style="margin-top:6px">
+        <div class="field-lg">
+          <span class="label">Denominazione sostituto</span>
+          <span class="value">ISTITUTO NAZIONALE PREVIDENZA SOCIALE – INPS</span>
+        </div>
+        <div class="field">
+          <span class="label">Codice fiscale sostituto</span>
+          <span class="value">80078750587</span>
+        </div>
+      </div>
+
+      <div class="bar" style="margin-top:8px">RC1 – Reddito da pensione INPS</div>
+      <div style="margin-top:4px">
+        <div class="rigo">
+          <span class="cod">RC1 col.1</span>
+          <span class="desc">Tipologia reddito (1=pensione)</span>
+          <span class="imp">1</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RC1 col.2</span>
+          <span class="desc">Numero giorni lavoro/pensione</span>
+          <span class="imp">365</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RC1 col.3</span>
+          <span class="desc">Reddito da pensione – Importo lordo annuo (€)</span>
+          <span class="imp" style="font-weight:bold">18.500,00</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RC1 col.4</span>
+          <span class="desc">Ritenute IRPEF operate dal sostituto</span>
+          <span class="imp">2.960,00</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RC1 col.5</span>
+          <span class="desc">Ritenute addizionale regionale</span>
+          <span class="imp">370,00</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RC1 col.6</span>
+          <span class="desc">Ritenute addizionale comunale acconto</span>
+          <span class="imp">166,50</span>
+        </div>
+      </div>
+      <div class="nota">Fonte: Certificazione Unica 2025 trasmessa da INPS in data 28/02/2025</div>
+    </div>
+  </div>
+
+  <!-- SEZIONE RP – ONERI DETRAIBILI -->
+  <h2>QUADRO RP – Oneri e spese (detrazioni 19%)</h2>
+  <div class="section">
+    <div class="section-inner">
+
+      <div class="bar">RP1 – Spese sanitarie</div>
+      <div style="margin-top:4px">
+        <div class="rigo">
+          <span class="cod">RP1</span>
+          <span class="desc">Spese mediche e di assistenza specifica (scontrini, fatture medici, farmaci)</span>
+          <span class="imp" style="font-weight:bold">1.200,00</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RP2</span>
+          <span class="desc">Spese mediche per portatori di handicap</span>
+          <span class="imp">0,00</span>
+        </div>
+      </div>
+      <div class="nota" style="margin-bottom:8px">
+        Fonte: Sistema Tessera Sanitaria – dati trasmessi da farmacie e medici. Importo già al netto della franchigia di € 129,11.
+        Detrazione spettante: 19% di € 1.070,89 = € 203,47
+      </div>
+
+      <div class="bar">RP7 – Interessi passivi su mutui</div>
+      <div style="margin-top:4px">
+        <div class="rigo">
+          <span class="cod">RP7</span>
+          <span class="desc">Interessi passivi su mutuo ipotecario per acquisto abitazione principale</span>
+          <span class="imp" style="font-weight:bold">3.800,00</span>
+        </div>
+        <div class="rigo">
+          <span class="cod">RP8</span>
+          <span class="desc">Altri interessi passivi</span>
+          <span class="imp">0,00</span>
+        </div>
+      </div>
+      <div class="nota">
+        Fonte: certificazione interessi trasmessa da Banca Popolare di Roma (cod. fisc. 01234567890).
+        Detrazione spettante: 19% di € 3.800,00 = € 722,00 (max imponibile € 4.000,00)
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE RC6 – FAMILIARI A CARICO -->
+  <h2>QUADRO RC – Sezione II: Familiari a carico</h2>
+  <div class="section">
+    <div class="section-inner">
+      <table class="griglia">
+        <thead>
+          <tr>
+            <th>Rigo</th>
+            <th>Relazione</th>
+            <th>Codice fiscale familiare</th>
+            <th>Mesi a carico</th>
+            <th>% detrazione</th>
+            <th>Detrazione spettante (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>RC6 – F1</td>
+            <td>Coniuge</td>
+            <td>RSSMRA53C54H501Z</td>
+            <td>12</td>
+            <td>100%</td>
+            <td style="text-align:right">690,00</td>
+          </tr>
+          <tr>
+            <td>RC6 – F2</td>
+            <td>Figlio (1°)</td>
+            <td>RSSLCU80A01H501X</td>
+            <td>12</td>
+            <td>50%</td>
+            <td style="text-align:right">475,00</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="nota" style="margin-top:6px">
+        Coniuge: ROSSI MARIO, nato il 22/07/1950, CF RSSMRA50L22H501K — non titolare di redditi propri.<br>
+        Figlio: ROSSI LUCA, nato il 01/01/1980, a carico al 50% (altro 50% dichiarato dall'altro genitore).
+      </div>
+    </div>
+  </div>
+
+  <!-- SEZIONE RV – ADDIZIONALI -->
+  <h2>QUADRO RV – Addizionale regionale e comunale IRPEF</h2>
+  <div class="section">
+    <div class="section-inner">
+      <div class="bar">Addizionale regionale</div>
+      <div class="rigo" style="margin-top:4px">
+        <span class="cod">RV1</span>
+        <span class="desc">Regione di domicilio al 1° gennaio 2024</span>
+        <span class="imp">LAZIO (RM)</span>
+      </div>
+      <div class="rigo">
+        <span class="cod">RV2</span>
+        <span class="desc">Addizionale regionale dovuta (aliquota 1,73%)</span>
+        <span class="imp" style="font-weight:bold">320,05</span>
+      </div>
+
+      <div class="bar" style="margin-top:8px">Addizionale comunale</div>
+      <div class="rigo" style="margin-top:4px">
+        <span class="cod">RV3</span>
+        <span class="desc">Comune di domicilio al 1° gennaio 2024</span>
+        <span class="imp">ROMA (H501)</span>
+      </div>
+      <div class="rigo">
+        <span class="cod">RV4</span>
+        <span class="desc">Addizionale comunale saldo (aliquota 0,9%)</span>
+        <span class="imp" style="font-weight:bold">166,50</span>
+      </div>
+      <div class="rigo">
+        <span class="cod">RV5</span>
+        <span class="desc">Acconto addizionale comunale 2025 (30%)</span>
+        <span class="imp">49,95</span>
+      </div>
+      <div class="nota">Calcolata automaticamente sulla base del reddito imponibile e delle aliquote deliberate dal comune di Roma per l'anno 2024.</div>
+    </div>
+  </div>
+
+  <!-- RIEPILOGO -->
+  <h2>RIEPILOGO LIQUIDAZIONE IRPEF</h2>
+  <div class="section">
+    <div class="section-inner">
+      <table class="griglia">
+        <tbody>
+          <tr><td>Reddito complessivo (RC1)</td><td style="text-align:right;font-weight:bold">18.500,00</td></tr>
+          <tr><td>Detrazione pensione art.13 TUIR</td><td style="text-align:right">1.725,00</td></tr>
+          <tr><td>IRPEF lorda (aliquote progressive)</td><td style="text-align:right">3.330,00</td></tr>
+          <tr><td>Detrazione familiari a carico</td><td style="text-align:right">1.165,00</td></tr>
+          <tr><td>Detrazione spese mediche (19%)</td><td style="text-align:right">203,47</td></tr>
+          <tr><td>Detrazione interessi mutuo (19%)</td><td style="text-align:right">722,00</td></tr>
+          <tr><td><strong>IRPEF netta dovuta</strong></td><td style="text-align:right;font-weight:bold">1.239,53</td></tr>
+          <tr><td>Ritenute operate da INPS</td><td style="text-align:right">2.960,00</td></tr>
+          <tr style="background:#e8f5e9"><td><strong>A RIMBORSO (colonna 1 mod. 730-3)</strong></td><td style="text-align:right;font-weight:bold;color:#1b5e20">1.720,47</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FIRMA -->
+  <div class="firma-box">
+    <div class="field" style="flex:3">
+      <span class="label">Firma del dichiarante</span>
+    </div>
+    <div class="field" style="flex:1">
+      <span class="label">Data</span>
+      <span style="font-size:8pt">_______ / _______ / 2025</span>
+    </div>
+    <div style="flex:2;font-size:7.5pt;color:#555;border-left:1px solid #ccc;padding-left:10px">
+      Dichiaro, sotto la mia responsabilità, che i dati indicati nel presente modello corrispondono al vero.
+      Il presente modello è precompilato dall'Agenzia delle Entrate ai sensi dell'art. 1 del D.Lgs. 175/2014.
+    </div>
+  </div>
+
+  <div style="margin-top:8px;font-size:7pt;color:#777;text-align:center">
+    FAC SIMILE – Dati fittizi a scopo dimostrativo – Non valido ai fini fiscali<br>
+    Modello 730/2025 – Periodo d'imposta 2024 – Cod. mod. 730-1 rev. 2025
+  </div>
+
+</div>
+</body>
+</html>
