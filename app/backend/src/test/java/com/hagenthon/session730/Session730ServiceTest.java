@@ -79,15 +79,13 @@ class Session730ServiceTest {
     // ─── getCurrentStep ───────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("Session730Service - getCurrentStep - sessione valida restituisce StepResponse")
+    @DisplayName("Session730Service - getCurrentStep - sessione valida al primo step restituisce StepResponse")
     void getCurrentStep_validSession_returnsStepResponse() {
-        // given
+        // given — step 0 = NOME_COGNOME (MANUAL_ENTRY), nessun documento da cercare
         User user = buildUser();
         UUID sessionId = UUID.randomUUID();
         Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
-        when(documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(any(), any()))
-                .thenReturn(Optional.empty());
 
         // when
         StepResponse response = session730Service.getCurrentStep(user, sessionId);
@@ -96,8 +94,11 @@ class Session730ServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.isCompleted()).isFalse();
         assertThat(response.stepIndex()).isEqualTo(0);
-        assertThat(response.stepName()).isEqualTo("Pensione INPS");
+        assertThat(response.stepName()).isEqualTo("Nome e Cognome");
+        assertThat(response.stepType()).isEqualTo("MANUAL_ENTRY");
         assertThat(response.alreadyUploaded()).isFalse();
+        // Nessuna interazione col repository documenti per step MANUAL_ENTRY
+        verifyNoInteractions(documentRepository);
     }
 
     @Test
@@ -132,12 +133,12 @@ class Session730ServiceTest {
     }
 
     @Test
-    @DisplayName("Session730Service - getCurrentStep - documento già caricato restituisce alreadyUploaded true")
+    @DisplayName("Session730Service - getCurrentStep - documento già caricato per step DOCUMENT_UPLOAD restituisce alreadyUploaded true")
     void getCurrentStep_documentAlreadyUploaded_returnsAlreadyUploadedTrue() {
-        // given
+        // given — step 6 = PENSIONE_INPS (DOCUMENT_UPLOAD)
         User user = buildUser();
         UUID sessionId = UUID.randomUUID();
-        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        Session730 session = buildSession(user, 6, SessionStatus.IN_PROGRESS);
         UploadedDocument doc = new UploadedDocument();
         doc.setExtractedValue("1000.00");
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
@@ -150,6 +151,76 @@ class Session730ServiceTest {
         // then
         assertThat(response.alreadyUploaded()).isTrue();
         assertThat(response.previewValue()).isEqualTo("1000.00");
+        assertThat(response.stepType()).isEqualTo("DOCUMENT_UPLOAD");
+    }
+
+    // ─── submitManualValue ─────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Session730Service - submitManualValue - valori coincidenti restituisce OK")
+    void submitManualValue_valoriCoincidenti_restituisceOk() {
+        // given — step 0 = NOME_COGNOME; nel 730 c'è "MARIO ROSSI"
+        User user = buildUser();
+        UUID sessionId = UUID.randomUUID();
+        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        session.setStepsData("{\"NOME_COGNOME\":\"MARIO ROSSI\"}");
+        when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
+
+        // when
+        Map<String, Object> result = session730Service.submitManualValue(user, sessionId, "Mario Rossi");
+
+        // then
+        assertThat(result.get("comparison")).isEqualTo("OK");
+        assertThat(result.get("value730")).isEqualTo("MARIO ROSSI");
+        assertThat(result.get("valueUser")).isEqualTo("Mario Rossi");
+    }
+
+    @Test
+    @DisplayName("Session730Service - submitManualValue - valori divergenti restituisce MISMATCH")
+    void submitManualValue_valoriDivergenti_restituisceMismatch() {
+        // given
+        User user = buildUser();
+        UUID sessionId = UUID.randomUUID();
+        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        session.setStepsData("{\"NOME_COGNOME\":\"MARIO BIANCHI\"}");
+        when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
+
+        // when
+        Map<String, Object> result = session730Service.submitManualValue(user, sessionId, "Mario Rossi");
+
+        // then
+        assertThat(result.get("comparison")).isEqualTo("MISMATCH");
+    }
+
+    @Test
+    @DisplayName("Session730Service - submitManualValue - valore730 assente restituisce PENDING")
+    void submitManualValue_valore730Assente_restituiscePending() {
+        // given — stepsData vuoto, nessun valore 730 per NOME_COGNOME
+        User user = buildUser();
+        UUID sessionId = UUID.randomUUID();
+        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
+
+        // when
+        Map<String, Object> result = session730Service.submitManualValue(user, sessionId, "Mario Rossi");
+
+        // then
+        assertThat(result.get("comparison")).isEqualTo("PENDING");
+    }
+
+    @Test
+    @DisplayName("Session730Service - submitManualValue - step DOCUMENT_UPLOAD lancia IllegalArgumentException")
+    void submitManualValue_stepDocumentUpload_throwsIllegalArgumentException() {
+        // given — step 6 = PENSIONE_INPS (DOCUMENT_UPLOAD)
+        User user = buildUser();
+        UUID sessionId = UUID.randomUUID();
+        Session730 session = buildSession(user, 6, SessionStatus.IN_PROGRESS);
+        when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
+
+        // when / then
+        assertThatThrownBy(() -> session730Service.submitManualValue(user, sessionId, "valore"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("inserimento manuale");
     }
 
     // ─── uploadDocument ───────────────────────────────────────────────────────
@@ -157,10 +228,10 @@ class Session730ServiceTest {
     @Test
     @DisplayName("Session730Service - uploadDocument - file valido restituisce extractedValue")
     void uploadDocument_validFile_returnsExtractedValue() throws IOException {
-        // given
+        // given — step 6 = PENSIONE_INPS (DOCUMENT_UPLOAD)
         User user = buildUser();
         UUID sessionId = UUID.randomUUID();
-        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        Session730 session = buildSession(user, 6, SessionStatus.IN_PROGRESS);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "cu.pdf", "application/pdf", "Contenuto documento CU".getBytes());
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
@@ -176,7 +247,25 @@ class Session730ServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).containsKey("extractedValue");
         assertThat(result.get("extractedValue")).isEqualTo("1500.00");
+        assertThat(result).containsKey("comparison");
         verify(documentRepository).save(any(UploadedDocument.class));
+    }
+
+    @Test
+    @DisplayName("Session730Service - uploadDocument - step MANUAL_ENTRY lancia IllegalArgumentException")
+    void uploadDocument_stepManualEntry_throwsIllegalArgumentException() throws IOException {
+        // given — step 0 = NOME_COGNOME (MANUAL_ENTRY)
+        User user = buildUser();
+        UUID sessionId = UUID.randomUUID();
+        Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "doc.pdf", "application/pdf", "content".getBytes());
+        when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
+
+        // when / then
+        assertThatThrownBy(() -> session730Service.uploadDocument(user, sessionId, file))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("documento");
     }
 
     @Test
@@ -201,23 +290,21 @@ class Session730ServiceTest {
     @Test
     @DisplayName("Session730Service - confirmStep - valore confermato avanza al prossimo step")
     void confirmStep_validValue_advancesToNextStep() {
-        // given
+        // given — step 0 = NOME_COGNOME, il successivo è DATA_NASCITA (step 1)
         User user = buildUser();
         UUID sessionId = UUID.randomUUID();
         Session730 session = buildSession(user, 0, SessionStatus.IN_PROGRESS);
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
         when(sessionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(any(), any()))
-                .thenReturn(Optional.empty());
 
         // when
-        Map<String, Object> result = session730Service.confirmStep(user, sessionId, "1500.00");
+        Map<String, Object> result = session730Service.confirmStep(user, sessionId, "Mario Rossi");
 
         // then
         assertThat(result).isNotNull();
         assertThat(result).containsKey("isCompleted");
         assertThat(result.get("isCompleted")).isEqualTo(false);
-        assertThat(result.get("nextStep")).isEqualTo("REDDITO_LAVORO_DIPENDENTE");
+        assertThat(result.get("nextStep")).isEqualTo("DATA_NASCITA");
     }
 
     @Test
@@ -238,10 +325,10 @@ class Session730ServiceTest {
     @Test
     @DisplayName("Session730Service - confirmStep - conferma ultimo step manuale segna sessione completata")
     void confirmStep_lastManualStep_marksSessionCompleted() {
-        // given - step 4 (DETRAZIONE_FAMILIARI), il successivo (5=ADDIZIONALE) è automatico
+        // given — step 10 (DETRAZIONE_FAMILIARI), il successivo (11=ADDIZIONALE) è automatico
         User user = buildUser();
         UUID sessionId = UUID.randomUUID();
-        Session730 session = buildSession(user, 4, SessionStatus.IN_PROGRESS);
+        Session730 session = buildSession(user, 10, SessionStatus.IN_PROGRESS);
         when(sessionRepository.findByIdAndUser(sessionId, user)).thenReturn(Optional.of(session));
         when(sessionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(any(), any()))

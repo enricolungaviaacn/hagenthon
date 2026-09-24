@@ -7,6 +7,7 @@ import com.hagenthon.document.UploadedDocumentRepository;
 import com.hagenthon.pdf.DocumentDataExtractor;
 import com.hagenthon.pdf.PdfAnalyzerService;
 import com.hagenthon.session730.Session730.SessionStatus;
+import com.hagenthon.session730.TrecentoStep.StepType;
 import com.hagenthon.session730.dto.*;
 import com.hagenthon.user.User;
 import lombok.RequiredArgsConstructor;
@@ -88,24 +89,90 @@ public class Session730Service {
         if (session.getStatus() == SessionStatus.COMPLETED
                 || session.getCurrentStepIndex() >= TrecentoStep.totalSteps()) {
             return new StepResponse(session.getCurrentStepIndex(), "Completato",
-                    null, null, false, null, true);
+                    null, null, null, false, null, null, null, null, true);
         }
 
         TrecentoStep step = TrecentoStep.byIndex(session.getCurrentStepIndex());
+        Map<String, String> stepsData = fromJson(session.getStepsData());
+        String value730 = stepsData.get(step.name());
 
-        // Se il documento è già stato caricato dall'utente in qualsiasi sessione, non richiederlo
+        if (step.getStepType() == StepType.MANUAL_ENTRY) {
+            log.debug("getCurrentStep: step={} tipo=MANUAL_ENTRY value730={}", step.name(), value730);
+            return new StepResponse(
+                    step.getIndex(),
+                    step.getDisplayName(),
+                    step.getStepType().name(),
+                    null,
+                    step.getDescription(),
+                    false,
+                    value730,
+                    null,
+                    ComparisonResult.PENDING,
+                    value730,
+                    false
+            );
+        }
+
+        // DOCUMENT_UPLOAD — verifica se l'utente ha già caricato un documento per questo step
         Optional<UploadedDocument> existing =
                 documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(user, step);
+
+        String valueDocument = existing.map(UploadedDocument::getExtractedValue).orElse(null);
+        ComparisonResult comparison = computeComparison(value730, valueDocument);
+
+        log.debug("getCurrentStep: step={} tipo=DOCUMENT_UPLOAD value730={} valueDoc={} comparison={}",
+                step.name(), value730, valueDocument, comparison);
 
         return new StepResponse(
                 step.getIndex(),
                 step.getDisplayName(),
+                step.getStepType().name(),
                 step.getDocumentRequired(),
                 step.getDescription(),
                 existing.isPresent(),
-                existing.map(UploadedDocument::getExtractedValue).orElse(null),
+                value730,
+                valueDocument,
+                comparison,
+                valueDocument,
                 false
         );
+    }
+
+    /**
+     * Gestisce l'inserimento manuale del valore per gli step di tipo MANUAL_ENTRY.
+     * Confronta il valore digitato dall'utente con quello estratto dal 730
+     * e restituisce l'esito del confronto senza ancora avanzare allo step successivo.
+     * L'utente deve poi chiamare {@code confirmStep} per confermare il valore scelto.
+     *
+     * @param user       utente autenticato
+     * @param sessionId  identificatore della sessione
+     * @param userValue  valore inserito dall'utente
+     * @return mappa con {@code value730}, {@code valueUser} e {@code comparison}
+     */
+    public Map<String, Object> submitManualValue(User user, UUID sessionId, String userValue) {
+        log.info("submitManualValue: utente={} sessione={}", user.getEmail(), sessionId);
+        Session730 session = getSession(user, sessionId);
+
+        if (session.getCurrentStepIndex() >= TrecentoStep.totalSteps()) {
+            throw new IllegalArgumentException("Tutti gli step sono già completati");
+        }
+
+        TrecentoStep step = TrecentoStep.byIndex(session.getCurrentStepIndex());
+        if (step.getStepType() != StepType.MANUAL_ENTRY) {
+            throw new IllegalArgumentException("Lo step corrente non è di tipo inserimento manuale");
+        }
+
+        Map<String, String> stepsData = fromJson(session.getStepsData());
+        String value730 = stepsData.get(step.name());
+
+        ComparisonResult comparison = computeComparison(value730, userValue);
+        log.info("submitManualValue: step={} comparison={}", step.name(), comparison);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("value730", value730 != null ? value730 : "");
+        result.put("valueUser", userValue);
+        result.put("comparison", comparison.name());
+        return result;
     }
 
     @Transactional
@@ -117,12 +184,15 @@ public class Session730Service {
         }
 
         TrecentoStep step = TrecentoStep.byIndex(session.getCurrentStepIndex());
+        if (step.getStepType() != StepType.DOCUMENT_UPLOAD) {
+            throw new IllegalArgumentException("Lo step corrente non richiede il caricamento di un documento");
+        }
+
         log.info("uploadDocument: step corrente={}", step.name());
         String filePath = saveFile(user.getId(), file);
 
         String docText = pdfAnalyzerService.extractText(filePath);
         if (docText.isBlank()) {
-            // Immagine o PDF non testuale: usiamo il nome file come contesto
             docText = "Documento caricato: " + file.getOriginalFilename();
         }
 
@@ -141,7 +211,18 @@ public class Session730Service {
         documentRepository.save(doc);
         log.info("uploadDocument: valore estratto per step={} value={}", step.name(), extractedValue);
 
-        return Map.of("extractedValue", extractedValue, "preview", extractedValue);
+        // Recupera il valore del 730 per il confronto
+        Map<String, String> stepsData = fromJson(session.getStepsData());
+        String value730 = stepsData.get(step.name());
+        ComparisonResult comparison = computeComparison(value730, extractedValue);
+        log.info("uploadDocument: comparison={}", comparison);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("extractedValue", extractedValue);
+        result.put("preview", extractedValue);
+        result.put("value730", value730 != null ? value730 : "");
+        result.put("comparison", comparison.name());
+        return result;
     }
 
     @Transactional
@@ -159,12 +240,14 @@ public class Session730Service {
         stepsData.put(step.name(), confirmedValue);
         session.setStepsData(toJson(stepsData));
 
-        // Marca il documento come confermato
-        documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(user, step)
-                .ifPresent(doc -> {
-                    doc.setConfirmed(true);
-                    documentRepository.save(doc);
-                });
+        // Per gli step con documento, segna il documento come confermato
+        if (step.getStepType() == StepType.DOCUMENT_UPLOAD) {
+            documentRepository.findTopByUserAndDocTypeOrderByUploadedAtDesc(user, step)
+                    .ifPresent(doc -> {
+                        doc.setConfirmed(true);
+                        documentRepository.save(doc);
+                    });
+        }
 
         // Avanza allo step successivo
         session.setCurrentStepIndex(session.getCurrentStepIndex() + 1);
@@ -221,7 +304,22 @@ public class Session730Service {
                 .orElseThrow(() -> new IllegalArgumentException("Sessione non trovata o accesso negato"));
     }
 
-    // Avanza automaticamente gli step automatici (es. ADDIZIONALE)
+    // ─── Utility private ──────────────────────────────────────────────────────
+
+    /**
+     * Confronta due valori stringa normalizzandoli (trim + uppercase + collasso degli spazi).
+     * Se uno dei due è null o vuoto, restituisce PENDING.
+     */
+    private ComparisonResult computeComparison(String value730, String valueUser) {
+        if (value730 == null || value730.isBlank() || valueUser == null || valueUser.isBlank()) {
+            return ComparisonResult.PENDING;
+        }
+        String n730 = value730.trim().toUpperCase(Locale.ITALIAN).replaceAll("\\s+", " ");
+        String nUser = valueUser.trim().toUpperCase(Locale.ITALIAN).replaceAll("\\s+", " ");
+        return n730.equals(nUser) ? ComparisonResult.OK : ComparisonResult.MISMATCH;
+    }
+
+    /** Avanza automaticamente gli step automatici (es. ADDIZIONALE). */
     private Session730 advanceAutomaticSteps(Session730 session) {
         boolean changed = false;
         while (session.getCurrentStepIndex() < TrecentoStep.totalSteps()) {

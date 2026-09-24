@@ -119,16 +119,18 @@ class Session730ControllerTest {
     @Test
     @DisplayName("Session730Controller - getCurrentStep - sessione valida restituisce 200 con StepResponse")
     void getCurrentStep_validSession_returns200WithStepResponse() throws Exception {
-        // given
-        StepResponse stepResp = new StepResponse(0, "Pensione INPS",
-                "CU - Certificazione Unica", "Descrizione", false, null, false);
+        // given — step 0 = NOME_COGNOME (MANUAL_ENTRY)
+        StepResponse stepResp = new StepResponse(0, "Nome e Cognome",
+                "MANUAL_ENTRY", null, "Inserire nome e cognome",
+                false, null, null, null, null, false);
         when(session730Service.getCurrentStep(any(), eq(sessionId))).thenReturn(stepResp);
 
         // when / then
         mockMvc.perform(get("/api/sessions/{id}/current-step", sessionId).with(userAuth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stepName").value("Pensione INPS"))
+                .andExpect(jsonPath("$.stepName").value("Nome e Cognome"))
                 .andExpect(jsonPath("$.stepIndex").value(0))
+                .andExpect(jsonPath("$.stepType").value("MANUAL_ENTRY"))
                 .andExpect(jsonPath("$.isCompleted").value(false));
     }
 
@@ -151,7 +153,7 @@ class Session730ControllerTest {
     @DisplayName("Session730Controller - uploadPdf - file valido restituisce 200 con sessionId")
     void uploadPdf_validFile_returns200WithSessionId() throws Exception {
         // given
-        UploadPdfResponse uploadResp = new UploadPdfResponse(sessionId, "PENSIONE_INPS", 0);
+        UploadPdfResponse uploadResp = new UploadPdfResponse(sessionId, "NOME_COGNOME", 0);
         when(session730Service.uploadPdf(any(), any())).thenReturn(uploadResp);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "modello730.pdf", "application/pdf", "contenuto".getBytes());
@@ -160,8 +162,61 @@ class Session730ControllerTest {
         mockMvc.perform(multipart("/api/sessions/upload-730").file(file).with(userAuth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessionId").value(sessionId.toString()))
-                .andExpect(jsonPath("$.currentStep").value("PENSIONE_INPS"))
+                .andExpect(jsonPath("$.currentStep").value("NOME_COGNOME"))
                 .andExpect(jsonPath("$.currentStepIndex").value(0));
+    }
+
+    // ─── POST /api/sessions/{sessionId}/submit-manual-value ───────────────────
+
+    @Test
+    @DisplayName("Session730Controller - submitManualValue - valori coincidenti restituisce 200 con OK")
+    void submitManualValue_valoriCoincidenti_returns200WithOk() throws Exception {
+        // given
+        ManualValueRequest req = new ManualValueRequest("Mario Rossi");
+        Map<String, Object> serviceResult = Map.of(
+                "value730", "MARIO ROSSI", "valueUser", "Mario Rossi", "comparison", "OK");
+        when(session730Service.submitManualValue(any(), eq(sessionId), anyString())).thenReturn(serviceResult);
+
+        // when / then
+        mockMvc.perform(post("/api/sessions/{id}/submit-manual-value", sessionId)
+                        .with(userAuth())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.comparison").value("OK"))
+                .andExpect(jsonPath("$.value730").value("MARIO ROSSI"));
+    }
+
+    @Test
+    @DisplayName("Session730Controller - submitManualValue - userValue nullo restituisce 400")
+    void submitManualValue_nullUserValue_returns400() throws Exception {
+        // given
+        ManualValueRequest req = new ManualValueRequest(null);
+
+        // when / then
+        mockMvc.perform(post("/api/sessions/{id}/submit-manual-value", sessionId)
+                        .with(userAuth())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+        verify(session730Service, never()).submitManualValue(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Session730Controller - submitManualValue - step non manuale restituisce 400")
+    void submitManualValue_stepNotManual_returns400() throws Exception {
+        // given
+        ManualValueRequest req = new ManualValueRequest("valore");
+        when(session730Service.submitManualValue(any(), any(), anyString()))
+                .thenThrow(new IllegalArgumentException("Lo step corrente non è di tipo inserimento manuale"));
+
+        // when / then
+        mockMvc.perform(post("/api/sessions/{id}/submit-manual-value", sessionId)
+                        .with(userAuth())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Lo step corrente non è di tipo inserimento manuale"));
     }
 
     // ─── POST /api/sessions/{sessionId}/upload-document ──────────────────────
@@ -170,7 +225,9 @@ class Session730ControllerTest {
     @DisplayName("Session730Controller - uploadDocument - file valido restituisce 200 con extractedValue")
     void uploadDocument_validFile_returns200WithExtractedValue() throws Exception {
         // given
-        Map<String, Object> serviceResult = Map.of("extractedValue", "1500.00", "preview", "1500.00");
+        Map<String, Object> serviceResult = Map.of(
+                "extractedValue", "1500.00", "preview", "1500.00",
+                "value730", "", "comparison", "PENDING");
         when(session730Service.uploadDocument(any(), eq(sessionId), any())).thenReturn(serviceResult);
         MockMultipartFile file = new MockMultipartFile(
                 "file", "cu.pdf", "application/pdf", "contenuto".getBytes());
@@ -179,7 +236,8 @@ class Session730ControllerTest {
         mockMvc.perform(multipart("/api/sessions/{id}/upload-document", sessionId)
                         .file(file).with(userAuth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.extractedValue").value("1500.00"));
+                .andExpect(jsonPath("$.extractedValue").value("1500.00"))
+                .andExpect(jsonPath("$.comparison").value("PENDING"));
     }
 
     @Test
@@ -203,10 +261,10 @@ class Session730ControllerTest {
     @Test
     @DisplayName("Session730Controller - confirmStep - valore confermato restituisce 200 con nextStep")
     void confirmStep_validRequest_returns200WithNextStep() throws Exception {
-        // given
-        ConfirmStepRequest req = new ConfirmStepRequest("1500.00");
+        // given — dal primo step NOME_COGNOME, il prossimo è DATA_NASCITA
+        ConfirmStepRequest req = new ConfirmStepRequest("Mario Rossi");
         Map<String, Object> serviceResult = Map.of(
-                "nextStep", "REDDITO_LAVORO_DIPENDENTE", "isCompleted", false);
+                "nextStep", "DATA_NASCITA", "isCompleted", false);
         when(session730Service.confirmStep(any(), eq(sessionId), anyString())).thenReturn(serviceResult);
 
         // when / then
@@ -215,7 +273,7 @@ class Session730ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nextStep").value("REDDITO_LAVORO_DIPENDENTE"))
+                .andExpect(jsonPath("$.nextStep").value("DATA_NASCITA"))
                 .andExpect(jsonPath("$.isCompleted").value(false));
     }
 

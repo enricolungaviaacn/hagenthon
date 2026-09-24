@@ -15,7 +15,38 @@ import java.util.regex.Pattern;
 @Slf4j
 public class DocumentDataExtractor {
 
-    // ─── Pattern per il modello 730 precompilato ──────────────────────────────
+    // ─── Pattern per il frontespizio del 730 precompilato ─────────────────────
+
+    /** Nome e cognome: sequenza di parole in maiuscolo vicino a "cognome" / "nome". */
+    private static final Pattern NOME_COGNOME_730 = Pattern.compile(
+            "(?i)(?:cognome[^\\n]{0,30}|\\bnome[^\\n]{0,30})" +
+            "([A-ZÀÈÌÒÙÉÁÍÓÚ][A-ZÀ-Ÿa-zà-ÿ'\\-]+(?:\\s+[A-ZÀÈÌÒÙÉÁÍÓÚ][A-ZÀ-Ÿa-zà-ÿ'\\-]+){1,3})",
+            Pattern.DOTALL);
+
+    /** Data di nascita: gg/mm/aaaa vicino a "nato" / "nascita". */
+    private static final Pattern DATA_NASCITA_730 = Pattern.compile(
+            "(?i)(?:nat[oa]\\s+il|data\\s+di\\s+nascita)[^\\n]{0,40}?(\\d{2}/\\d{2}/\\d{4})",
+            Pattern.DOTALL);
+
+    /** Codice fiscale: pattern standard a 16 caratteri alfanumerici. */
+    private static final Pattern CODICE_FISCALE_730 = Pattern.compile(
+            "\\b([A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z])\\b");
+
+    /** Sesso: M o F vicino alla parola "sesso". */
+    private static final Pattern SESSO_730 = Pattern.compile(
+            "(?i)sesso[^\\n]{0,40}?\\b([MF])\\b");
+
+    /** Comune di nascita: testo dopo "comune di nascita". */
+    private static final Pattern COMUNE_NASCITA_730 = Pattern.compile(
+            "(?i)comune\\s+di\\s+nascita[^\\n]{0,15}([A-ZÀÈÌÒÙÉÁÍÓÚ][A-Za-zÀ-ÿ'\\s\\-]{1,40})",
+            Pattern.DOTALL);
+
+    /** Domicilio / residenza: riga che inizia con via, viale, piazza, corso ecc. */
+    private static final Pattern DOMICILIO_730 = Pattern.compile(
+            "(?i)(?:via|viale|piazza|corso|vicolo|largo|domicilio|residenza)[^\\n]{5,100}",
+            Pattern.DOTALL);
+
+    // ─── Pattern per i quadri fiscali del 730 ────────────────────────────────
 
     private static final Pattern PENSIONE_INPS = Pattern.compile(
             "(?i)pension[ei][^\\n]{0,80}?(\\d[\\d.]*,\\d{2}|\\d[\\d.,]+)",
@@ -55,12 +86,12 @@ public class DocumentDataExtractor {
             "(?i)(quota\\s+interessi|interessi?\\s+detraibil[ie])[^\\n]{0,80}?(\\d[\\d.]*,\\d{2}|\\d[\\d.,]+)",
             Pattern.DOTALL);
 
-    // ─── API pubblica ─────────────────────────────────────────────────────────
+    // ─── API pubblica: estrazione dal 730 ────────────────────────────────────
 
     /**
      * Analizza il testo di un modello 730 precompilato ed estrae i principali
-     * campi fiscali usando regex. Restituisce una mappa vuota se nessun valore
-     * riconoscibile è presente: l'utente completerà i dati manualmente.
+     * campi (anagrafici e fiscali) mediante regex.
+     * Restituisce una mappa vuota se nessun valore riconoscibile è presente.
      *
      * @param pdfText testo estratto dal PDF
      * @return mappa chiave → valore estratto; mai null
@@ -75,6 +106,15 @@ public class DocumentDataExtractor {
         Map<String, String> result = new LinkedHashMap<>();
         String text = pdfText;
 
+        // Dati anagrafici (frontespizio)
+        extractNomeCognome(text).ifPresent(v -> result.put("NOME_COGNOME", v));
+        extractDataNascita(text).ifPresent(v -> result.put("DATA_NASCITA", v));
+        extractCodiceFiscale(text).ifPresent(v -> result.put("CODICE_FISCALE", v));
+        extractSesso(text).ifPresent(v -> result.put("SESSO", v));
+        extractComuneNascita(text).ifPresent(v -> result.put("COMUNE_NASCITA", v));
+        extractDomicilio(text).ifPresent(v -> result.put("DOMICILIO", v));
+
+        // Dati fiscali (quadri RC e RP)
         extractFirstGroup(PENSIONE_INPS, text, 1)
                 .ifPresent(v -> result.put("PENSIONE_INPS", v));
 
@@ -98,6 +138,82 @@ public class DocumentDataExtractor {
         log.info("analyzePdf730: estratti {} campi dal testo 730", result.size());
         return result;
     }
+
+    // ─── API pubblica: estrazione dati anagrafici ─────────────────────────────
+
+    /**
+     * Estrae nome e cognome dal testo del 730 precompilato.
+     * Cerca il primo nome proprio maiuscolo vicino alle parole "cognome" o "nome".
+     *
+     * @param text testo del PDF
+     * @return nome e cognome trovati, oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractNomeCognome(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        return extractFirstGroup(NOME_COGNOME_730, text, 1);
+    }
+
+    /**
+     * Estrae la data di nascita nel formato gg/mm/aaaa dal testo del 730.
+     *
+     * @param text testo del PDF
+     * @return data di nascita formattata, oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractDataNascita(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        return extractFirstGroup(DATA_NASCITA_730, text, 1);
+    }
+
+    /**
+     * Estrae il codice fiscale (16 caratteri alfanumerici) dal testo del 730.
+     *
+     * @param text testo del PDF
+     * @return codice fiscale trovato, oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractCodiceFiscale(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        return extractFirstGroup(CODICE_FISCALE_730, text, 1);
+    }
+
+    /**
+     * Estrae il sesso (M o F) dal testo del 730.
+     *
+     * @param text testo del PDF
+     * @return "M" o "F", oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractSesso(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        return extractFirstGroup(SESSO_730, text, 1);
+    }
+
+    /**
+     * Estrae il comune di nascita dal testo del 730.
+     *
+     * @param text testo del PDF
+     * @return nome del comune, oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractComuneNascita(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        return extractFirstGroup(COMUNE_NASCITA_730, text, 1)
+                .map(String::trim);
+    }
+
+    /**
+     * Estrae la riga di domicilio/residenza (via, piazza, corso ecc.) dal testo del 730.
+     *
+     * @param text testo del PDF
+     * @return indirizzo trovato, oppure {@link Optional#empty()}
+     */
+    public Optional<String> extractDomicilio(String text) {
+        if (text == null || text.isBlank()) return Optional.empty();
+        Matcher m = DOMICILIO_730.matcher(text);
+        if (m.find()) {
+            return Optional.of(m.group().trim());
+        }
+        return Optional.empty();
+    }
+
+    // ─── API pubblica: estrazione da documenti di supporto ────────────────────
 
     /**
      * Estrae un singolo valore da un documento di supporto (CU, scontrino,

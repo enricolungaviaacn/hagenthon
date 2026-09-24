@@ -53,6 +53,25 @@ public class Session730Controller {
         return ResponseEntity.ok(sessionService.getCurrentStep(user, sessionId));
     }
 
+    /**
+     * Gestisce l'inserimento manuale del valore per gli step di tipo MANUAL_ENTRY.
+     * Confronta il valore digitato con quello estratto dal 730 e restituisce l'esito
+     * senza avanzare allo step successivo: l'utente deve poi chiamare confirm-step.
+     */
+    @PostMapping("/{sessionId}/submit-manual-value")
+    public ResponseEntity<Map<String, Object>> submitManualValue(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID sessionId,
+            @Valid @RequestBody ManualValueRequest req) {
+        log.info("Session730Controller.submitManualValue: utente={} sessione={}", user.getEmail(), sessionId);
+        return ResponseEntity.ok(sessionService.submitManualValue(user, sessionId, req.userValue()));
+    }
+
+    /**
+     * Gestisce il caricamento di un documento di supporto per gli step di tipo DOCUMENT_UPLOAD.
+     * Estrae il valore dal documento, lo confronta con quello del 730 e restituisce
+     * extractedValue, value730 e comparison.
+     */
     @PostMapping("/{sessionId}/upload-document")
     public ResponseEntity<Map<String, Object>> uploadDocument(
             @AuthenticationPrincipal User user,
