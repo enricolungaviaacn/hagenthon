@@ -81,3 +81,6 @@ I funzionali possono solo visualizzare. L'hook check-db-access blocca le modific
 - Stato sessione JSON: voce_corrente, documenti_caricati, risultati, tentativi_per_voce
 - Model tiering: orchestratore = Sonnet, subagenti = Haiku
 - Nessun commento al codice se auto-esplicativo
+
+## Regola linguaggio (obbligatoria per tutti gli agenti)
+Nessun agente può mai usare o citare: AI, artificiale, intelligenza artificiale, giuria, gara, hackathon, contest, competizione — né in output verso l'utente finale né in commenti nel codice.

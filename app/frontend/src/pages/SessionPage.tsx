@@ -21,7 +21,6 @@ export default function SessionPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -64,8 +63,7 @@ export default function SessionPage() {
     setSubmitting(true);
     setError('');
     try {
-      const res = await submitSession(sessionId);
-      setDownloadUrl(res.downloadUrl);
+      await submitSession(sessionId);
       setSubmitted(true);
     } catch {
       setError('Errore durante il submit. Riprova.');
