@@ -64,6 +64,27 @@
             "command": "bash .claude/hooks/check-test-data.sh"
           }
         ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-branch.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-db-access.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-agent-role.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-test-data.sh"
+          }
+        ]
       }
     ]
   },
@@ -88,7 +109,9 @@
     ],
     "deny": [
       "Bash(git push --force*)",
-      "Bash(git push -f *)"
+      "Bash(git push -f *)",
+      "PowerShell(git push --force*)",
+      "PowerShell(git push -f *)"
     ]
   }
 }
