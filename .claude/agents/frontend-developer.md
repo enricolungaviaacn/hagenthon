@@ -50,6 +50,8 @@ npm run build
 ```
 Nessun errore TypeScript. Nessun warning rilevante.
 
+Non avviare `npm run dev` — l'avvio dei server spetta a junit-tester in FASE 3.
+
 ### 5. Commit e notifica
 ```bash
 git add app/frontend/src/

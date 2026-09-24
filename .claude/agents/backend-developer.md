@@ -56,9 +56,11 @@ log.error("nomeMetodo: fallito per input={}: {}", input, e.getMessage(), e);
 ### 4. Verifica
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-21.0.12.101-hotspot"
-& "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.6\bin\mvn.cmd" test -f "C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup\app\backend\pom.xml"
+& "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.6\bin\mvn.cmd" test -f "C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup\app\backend\pom.xml" -T 1C -q
 ```
-Tutti verdi prima del commit.
+Tutti verdi prima del commit. Questa è una verifica tua: la suite completa e la build spettano a junit-tester in FASE 2.
+
+Non avviare mai il backend (`spring-boot:run`) — l'avvio è compito di junit-tester in FASE 3.
 
 ### 5. Commit e notifica
 ```bash

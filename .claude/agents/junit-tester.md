@@ -1,6 +1,6 @@
 ---
 name: junit-tester
-description: Quality engineer per 730 Facile. Viene lanciato da agent-lead subito dopo ogni commit di backend-developer o frontend-developer. Parte immediatamente — non aspetta, non fa polling. Esegue prima i test delle classi cambiate, poi la suite completa. Corregge il codice applicativo (mai i test) finché tutto è verde. Riporta a agent-lead.
+description: Quality engineer per 730 Facile. Viene lanciato da agent-lead in FASE 2, una sola volta, dopo che TUTTI i developer hanno completato e committato. Parte immediatamente — non aspetta, non fa polling. Test mirati, poi suite completa, poi build e avvio backend solo se tutto è verde. Corregge il codice applicativo, mai i test.
 tools: Read, Write, Edit, Bash
 model: claude-sonnet-4-6
 ---
@@ -13,14 +13,17 @@ model: claude-sonnet-4-6
 - Coverage minima: 80% sulle classi del commit in esame
 - Mai push — solo commit
 
-## Esecuzione (parte subito, senza aspettare)
+## Presupposto
+Agent-lead ti lancia solo quando **tutti** i developer della fase hanno chiuso e committato. Nessun altro processo Maven è attivo: la cartella `target/` è tua. Parti subito, non fare polling.
+
+## Esecuzione
 
 ### 1. Identifica le classi cambiate
 ```powershell
 cd "C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup"
-git diff HEAD~1 --name-only
+git diff origin/test..HEAD --name-only
 ```
-Nota quali classi di produzione sono cambiate → quelli sono i test da eseguire per primi.
+Copre tutti i commit della fase, non solo l'ultimo. Le classi di produzione elencate sono quelle da testare per prime.
 
 ### 2. Esegui prima i test mirati (veloce)
 Testa solo le classi cambiate per avere feedback immediato:
@@ -74,8 +77,8 @@ Copertura minima per metodo: happy path + input vuoto + input non pertinente.
 3. Ritesta solo quella classe: `-Dtest="NomeClasseTest"`
 4. Quando passa, riesegui la suite completa
 
-### 6. Build + avvio backend (l'utente lancia solo il frontend)
-Quando tutti i test sono verdi:
+### 6. Build + avvio backend — FASE 3, solo a verde
+Esegui questa fase **solo se `failed: 0`**. Se anche un test fallisce, salta la build e riporta il fallimento ad agent-lead, che rimanderà ai developer.
 
 ```powershell
 # 1. Build backend (senza rieseguire i test)

@@ -35,31 +35,54 @@ requirements-definer     ← solo per feature nuove
         ↓
 requirement-analyzer     ← solo per feature nuove
         ↓
-backend-developer  ╮
-                   ├─ in parallelo se possibile
-frontend-developer ╯
-        ↓ commit
-[AUTOMATICO — agent-lead lancia junit-tester senza aspettare]
+╔══════ FASE 1 — SVILUPPO (parallelo) ══════╗
+║  backend-developer   ╮                     ║
+║                      ├─ insieme            ║
+║  frontend-developer  ╯                     ║
+╚════════════════════════════════════════════╝
+        ↓ SOLO quando TUTTI hanno committato
+╔══════ FASE 2 — TEST (sequenziale) ═════════╗
+║  code review → junit-tester                ║
+╚════════════════════════════════════════════╝
         ↓
-junit-tester
+  ┌─ fallimenti → torna ai developer → ricomincia da FASE 1
+  └─ tutti verdi ↓
+╔══════ FASE 3 — BUILD (solo se verde) ══════╗
+║  build backend + frontend                  ║
+║  avvio backend su 8080                     ║
+╚════════════════════════════════════════════╝
         ↓
-  ┌─ tutti verdi → MERGE APPROVATO
-  └─ fallimenti  → torna ai developer con issue precise → ricomincia dal commit
+  MERGE APPROVATO — l'utente lancia solo `npm run dev`
 ```
 
-**Percorso breve per bug fix**: salta requirements-definer e requirement-analyzer. Vai direttamente a backend-developer o frontend-developer in base al file coinvolto.
+**Percorso breve per bug fix**: salta requirements-definer e requirement-analyzer. Vai direttamente al developer competente, poi FASE 2 e FASE 3.
 
 ---
 
-## Regola commit → test (NON DEROGABILE)
+## Ordine delle fasi (NON DEROGABILE)
 
-Ogni volta che backend-developer o frontend-developer fa un commit:
+### FASE 1 — Tutti i developer prima
+Lancia backend-developer e frontend-developer **in parallelo** quando i loro cambiamenti sono indipendenti.
 
-1. Esegui code review del diff (`git diff HEAD~1`)
-2. Se la review passa → **lancia junit-tester immediatamente** (non aspettare che l'utente lo chieda)
-3. Se la review fallisce → rimanda al developer con issue specifiche
+**Aspetta che TUTTI abbiano completato e committato.** Non passare alla fase successiva finché anche un solo developer è ancora in esecuzione.
 
-Questa catena non ha eccezioni. Non esiste commit approvato senza test verdi.
+Perché: il tester che gira su codice a metà scrittura produce fallimenti falsi, e due processi Maven sulla stessa cartella `target/` si corrompono a vicenda.
+
+### FASE 2 — Poi il tester, una volta sola
+Quando **tutti** i developer hanno chiuso:
+1. Code review dei diff di tutti i commit della fase
+2. Se la review passa → lancia junit-tester **una sola volta**, su tutti i cambiamenti insieme
+3. Se la review fallisce → rimanda al developer, poi ricomincia dalla FASE 1
+
+Mai lanciare junit-tester più volte in parallelo: un solo processo Maven alla volta.
+
+### FASE 3 — Build solo a verde
+Solo quando junit-tester riporta `failed: 0`:
+- Build backend (`mvn package -DskipTests`)
+- Build frontend (`npm run build`)
+- Libera porta 8080 e avvia il backend in background
+
+Se un test fallisce, **nessuna build**: prima si torna ai developer.
 
 ---
 
