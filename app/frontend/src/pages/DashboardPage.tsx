@@ -88,7 +88,7 @@ export default function DashboardPage() {
         <span className="dashboard-logo">730 Facile</span>
         <div className="dashboard-user">
           <span>Ciao, <strong>{user.nome ?? user.email}</strong></span>
-          <button className="btn btn-ghost" style={{ padding: '8px 14px', fontSize: '13px' }} onClick={handleLogout}>
+          <button className="btn btn-ghost" style={{ padding: '10px 20px', fontSize: '15px', minHeight: '44px' }} onClick={handleLogout}>
             Esci
           </button>
         </div>

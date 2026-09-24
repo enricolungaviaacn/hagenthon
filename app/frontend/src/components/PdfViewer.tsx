@@ -30,7 +30,7 @@ export default function PdfViewer({ url, token }: Props) {
         });
 
         if (!response.ok) {
-          throw new Error('Impossibile caricare il PDF.');
+          throw new Error('Impossibile scaricare il documento.');
         }
 
         const buffer = await response.arrayBuffer();
@@ -63,9 +63,9 @@ export default function PdfViewer({ url, token }: Props) {
         }
 
         setLoading(false);
-      } catch (err) {
+      } catch {
         if (!cancelled) {
-          setError('Errore nel caricamento del PDF.');
+          setError('Non è stato possibile aprire il documento PDF. Il file potrebbe essere protetto o danneggiato.');
           setLoading(false);
         }
       }

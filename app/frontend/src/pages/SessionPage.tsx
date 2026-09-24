@@ -39,7 +39,7 @@ export default function SessionPage() {
       const s = await getCurrentStep(sessionId);
       setStep(s);
     } catch {
-      setError('Impossibile caricare lo step corrente.');
+      setError('Non è stato possibile caricare il passo corrente. Controlla la connessione e riprova.');
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function SessionPage() {
       await submitSession(sessionId);
       setSubmitted(true);
     } catch {
-      setError('Errore durante il submit. Riprova.');
+      setError('Non è stato possibile salvare la dichiarazione. Controlla la connessione e riprova.');
     } finally {
       setSubmitting(false);
     }
@@ -98,9 +98,28 @@ export default function SessionPage() {
             ← Dashboard
           </Link>
           <h2>Verifica guidata</h2>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-            {completedSteps.length}/{TOTAL_STEPS} step
+          <span style={{ fontSize: '15px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            {completedSteps.length} di {TOTAL_STEPS}
           </span>
+        </div>
+
+        {/* Barra di avanzamento */}
+        <div>
+          <div className="progress-label">
+            <span>
+              {isCompleted
+                ? 'Tutti i passi completati'
+                : step
+                  ? `Passo ${step.stepIndex + 1} di ${TOTAL_STEPS}: ${step.stepName}`
+                  : 'Caricamento…'}
+            </span>
+          </div>
+          <div className="progress-bar-track">
+            <div
+              className="progress-bar-fill"
+              style={{ width: `${(completedSteps.length / TOTAL_STEPS) * 100}%` }}
+            />
+          </div>
         </div>
 
         <div className="session-wizard-content">
@@ -109,9 +128,9 @@ export default function SessionPage() {
           )}
 
           {loading && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-muted)', fontSize: '16px' }}>
               <span className="spinner" />
-              Caricamento step…
+              Caricamento in corso…
             </div>
           )}
 
@@ -131,6 +150,7 @@ export default function SessionPage() {
             <StepWizard
               sessionId={sessionId}
               step={step}
+              totalSteps={TOTAL_STEPS}
               onStepComplete={handleStepComplete}
             />
           )}
@@ -150,9 +170,10 @@ function CompletionView({ completedSteps, submitting, onSubmit }: CompletionView
   return (
     <>
       <div className="completion-card">
-        <h2>✓ Verifica completata</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '14px' }}>
-          Hai verificato tutti i campi. Di seguito il riepilogo dei valori confermati.
+        <h2>Verifica completata</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '17px' }}>
+          Ottimo lavoro! Hai controllato tutti i dati presenti nel tuo 730.
+          Di seguito trovi il riepilogo dei valori che hai confermato.
         </p>
         <div className="completion-values">
           {completedSteps.map((s) => (
@@ -165,17 +186,18 @@ function CompletionView({ completedSteps, submitting, onSubmit }: CompletionView
       </div>
 
       <div className="disclaimer">
-        ⚠ Questi dati sono indicativi. I valori estratti automaticamente potrebbero contenere imprecisioni.
-        Ti consigliamo di verificare con un CAF o un professionista fiscale prima di procedere all'invio definitivo.
+        Attenzione: i valori qui mostrati sono stati letti dal documento caricato.
+        Ti consigliamo di confrontarli con l'originale e, in caso di dubbio,
+        di rivolgerti a un CAF o a un consulente fiscale prima di procedere.
       </div>
 
       <button
         className="btn btn-primary"
-        style={{ width: '100%', padding: '14px' }}
+        style={{ width: '100%', padding: '16px', fontSize: '18px', minHeight: '56px' }}
         onClick={onSubmit}
         disabled={submitting}
       >
-        {submitting ? <span className="spinner" /> : 'Invia e archivia'}
+        {submitting ? <span className="spinner" /> : 'Salva e archivia'}
       </button>
     </>
   );
@@ -184,13 +206,14 @@ function CompletionView({ completedSteps, submitting, onSubmit }: CompletionView
 function SubmittedView({ onDownload }: { onDownload: () => void }) {
   return (
     <div className="completion-card">
-      <h2 style={{ color: 'var(--accent)' }}>Dichiarazione inviata</h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '14px' }}>
-        La tua dichiarazione è stata archiviata con successo. Puoi scaricare il riepilogo in formato HTML.
+      <h2 style={{ color: 'var(--accent)' }}>Tutto fatto!</h2>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '17px' }}>
+        La tua dichiarazione è stata archiviata. Puoi scaricare il riepilogo per conservarlo.
+        Se hai dubbi sui valori, puoi sempre rivolgerti a un CAF.
       </p>
       <button
         className="btn btn-primary"
-        style={{ width: '100%', padding: '14px' }}
+        style={{ width: '100%', padding: '16px', fontSize: '18px', minHeight: '56px', marginBottom: '12px' }}
         onClick={onDownload}
       >
         Scarica riepilogo
@@ -198,9 +221,9 @@ function SubmittedView({ onDownload }: { onDownload: () => void }) {
       <Link
         to="/dashboard"
         className="btn btn-secondary"
-        style={{ display: 'block', textAlign: 'center', marginTop: '12px', padding: '12px', borderRadius: 'var(--radius)' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '14px', borderRadius: 'var(--radius)', fontSize: '16px', minHeight: '48px' }}
       >
-        Torna alla dashboard
+        Torna alla pagina principale
       </Link>
     </div>
   );
