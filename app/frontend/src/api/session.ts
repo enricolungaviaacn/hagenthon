@@ -4,6 +4,7 @@ import type {
   StepInfo,
   UploadResponse,
   UploadDocumentResponse,
+  ManualValueResponse,
   ConfirmStepResponse,
   SubmitResponse,
   Document,
@@ -51,6 +52,17 @@ export const confirmStep = async (
 
 export const submitSession = async (sessionId: string): Promise<SubmitResponse> => {
   const res = await client.post<SubmitResponse>(`/sessions/${sessionId}/submit`);
+  return res.data;
+};
+
+export const submitManualValue = async (
+  sessionId: string,
+  userValue: string
+): Promise<ManualValueResponse> => {
+  const res = await client.post<ManualValueResponse>(
+    `/sessions/${sessionId}/submit-manual-value`,
+    { userValue }
+  );
   return res.data;
 };
 

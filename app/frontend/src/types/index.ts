@@ -25,23 +25,42 @@ export interface Session {
 
 export interface UploadResponse {
   sessionId: string;
-  currentStep: string;      // nome dello step corrente (es. "PENSIONE_INPS")
-  currentStepIndex: number; // indice numerico dello step corrente
+  currentStep: string;
+  currentStepIndex: number;
 }
+
+export type StepType = 'MANUAL_ENTRY' | 'DOCUMENT_UPLOAD' | 'AUTOMATIC';
+export type ComparisonResult = 'OK' | 'MISMATCH' | 'PENDING';
 
 export interface StepInfo {
   stepIndex: number;
   stepName: string;
-  documentRequired: boolean;
-  documentDescription: string;
+  stepType: StepType;
+  documentRequired: string | null;
+  description: string;
   alreadyUploaded: boolean;
-  previewValue: string;
-  isAutomatic?: boolean;
+  value730: string | null;
+  valueDocument: string | null;
+  comparison: ComparisonResult;
+  previewValue: string | null;
+  isCompleted: boolean;
 }
 
 export interface UploadDocumentResponse {
   extractedValue: string;
   preview: string;
+}
+
+export interface ManualValueResponse {
+  value730: string | null;
+  valueUser: string;
+  comparison: ComparisonResult;
+}
+
+export interface ComparisonResponse {
+  value730: string | null;
+  valueDocument: string;
+  comparison: ComparisonResult;
 }
 
 export interface ConfirmStepRequest {

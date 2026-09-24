@@ -719,6 +719,168 @@ input, textarea, select {
   line-height: 1.6;
 }
 
+/* Comparison view */
+.comparison-pending {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  font-size: 17px;
+  color: var(--text-secondary);
+}
+
+.comparison-ok {
+  background: rgba(0, 230, 118, 0.08);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  text-align: center;
+  margin: 16px 0;
+}
+
+.comparison-ok-check {
+  font-size: 36px;
+  color: var(--success);
+  margin-bottom: 10px;
+}
+
+.comparison-ok-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 8px;
+}
+
+.comparison-ok-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.comparison-ok-btn {
+  margin-top: 4px;
+  min-height: 52px;
+  font-size: 17px;
+}
+
+.comparison-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin: 16px 0;
+}
+
+.comparison-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.comparison-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.comparison-values {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comparison-value-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.comparison-value-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.comparison-value-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.comparison-value-divider {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.comparison-question {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.comparison-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.comparison-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 20px;
+  min-height: 64px;
+  text-align: left;
+  width: 100%;
+}
+
+.comparison-btn-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.comparison-btn-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comparison-btn-other {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.comparison-custom {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.comparison-custom-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+
 /* Loader */
 .spinner {
   width: 18px;
