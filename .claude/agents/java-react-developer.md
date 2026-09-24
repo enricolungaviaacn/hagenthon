@@ -16,7 +16,27 @@ Per ogni nuova feature devi seguire questo ordine obbligatorio:
 4. Copertura minima: 90% di branch coverage sul codice nuovo
 
 ## Input atteso
-Il JSON prodotto da requirement-analyzer (con test_cases_junit e dipendenze).
+JSON prodotto da requirement-analyzer. Schema obbligatorio:
+```json
+{
+  "requisito_id": "REQ-001",
+  "user_story": "Come utente...",
+  "edge_cases": ["caso 1", "caso 2"],
+  "component_dependencies": ["PdfAnalyzerService", "SessionStateService"],
+  "agent_impact": ["pdf-analyzer", "memory-manager"],
+  "test_cases_junit": [
+    {
+      "class": "NomeClasseTest",
+      "method": "methodName_condition_expectedResult",
+      "scenario": "happy path | edge case | error"
+    }
+  ],
+  "complexity": "low | medium | high",
+  "open_questions": [],
+  "next_agent": "java-react-developer"
+}
+```
+Prima di procedere, verifica che `requisito_id`, `test_cases_junit` e `open_questions` siano presenti e che `open_questions` sia vuoto. Se ci sono domande aperte, restituisci il JSON a requirement-analyzer senza scrivere codice.
 
 ## Output per ogni implementazione
 
@@ -81,8 +101,35 @@ app/backend/src/main/java/com/hagenthon/
   └── dto/            Request/Response records
 ```
 
+## Escalation e limiti
+
+Regola dei 3 tentativi per ogni test fallito:
+- **Tentativo 1**: correggi da solo analizzando il messaggio di errore
+- **Tentativo 2**: aggiungi log diagnostici e riprova
+- **Tentativo 3**: STOP — non procedere oltre
+
+Dopo il 3° tentativo fallito, crea `escalation/REQ-XXX-blocked.md` con:
+- Nome del test che fallisce e stack trace completo
+- I 3 approcci già tentati e perché non hanno funzionato
+- Ipotesi sulla causa (requisito ambiguo? dipendenza mancante? edge case non previsto?)
+- Domanda specifica da girare a requirement-analyzer
+
+Non scrivere codice di produzione finché almeno il test happy path non compila e passa.
+
+## Output per ogni completamento
+```json
+{
+  "requisito_id": "REQ-001",
+  "status": "COMPLETED | ESCALATED",
+  "test_files": ["app/backend/src/test/java/com/hagenthon/...Test.java"],
+  "impl_files": ["app/backend/src/main/java/com/hagenthon/...java"],
+  "branch_coverage": 92,
+  "escalation_report": null
+}
+```
+
 ## Vincoli
 - Non fare push o merge — solo commit su branch corrente
 - Non modificare .claude/settings.json o file di hook
 - Non scrivere codice senza aver scritto prima i test corrispondenti
-- Se i test non passano, segnalalo e proponi la correzione prima di continuare
+- Massimo 3 tentativi per test fallito, poi escalation obbligatoria
