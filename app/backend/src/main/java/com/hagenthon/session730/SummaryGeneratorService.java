@@ -1,15 +1,19 @@
 package com.hagenthon.session730;
 
 import com.hagenthon.user.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
+@Slf4j
 public class SummaryGeneratorService {
 
     @SuppressWarnings("unchecked")
     public String generateHtml(Map<String, Object> summary, User user) {
+        log.info("SummaryGeneratorService.generateHtml: generazione riepilogo HTML per utente={} sessione={}",
+                user.getEmail(), summary.get("sessionId"));
         Map<String, String> values = (Map<String, String>) summary.getOrDefault("values", Map.of());
 
         StringBuilder rows = new StringBuilder();

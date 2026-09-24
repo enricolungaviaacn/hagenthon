@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -18,6 +19,7 @@ import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -35,17 +37,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         if (!jwtService.isTokenValid(token)) {
+            log.warn("JwtAuthFilter: token non valido per la richiesta {}", request.getRequestURI());
             chain.doFilter(request, response);
             return;
         }
 
         String email = jwtService.extractEmail(token);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            userRepository.findByEmail(email).ifPresent(user -> {
+            userRepository.findByEmail(email).ifPresentOrElse(user -> {
                 var auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            });
+                log.debug("JwtAuthFilter: utente autenticato email={} per {}", email, request.getRequestURI());
+            }, () -> log.warn("JwtAuthFilter: email={} estratta dal token ma utente non trovato nel DB", email));
         }
 
         chain.doFilter(request, response);

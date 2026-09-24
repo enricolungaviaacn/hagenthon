@@ -3,6 +3,7 @@ package com.hagenthon.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class JwtService {
 
     @Value("${app.jwt.secret}")
@@ -54,6 +56,7 @@ public class JwtService {
             extractClaims(token);
             return true;
         } catch (Exception e) {
+            log.warn("JwtService: token non valido — {}", e.getMessage());
             return false;
         }
     }

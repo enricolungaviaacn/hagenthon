@@ -17,14 +17,16 @@ export interface LoginRequest {
 
 export interface Session {
   id: string;
-  status: 'IN_PROGRESS' | 'COMPLETED' | 'SUBMITTED';
+  status: 'IN_PROGRESS' | 'COMPLETED';
   createdAt: string;
+  updatedAt: string;
   currentStepName: string;
 }
 
 export interface UploadResponse {
   sessionId: string;
-  currentStep: number;
+  currentStep: string;      // nome dello step corrente (es. "PENSIONE_INPS")
+  currentStepIndex: number; // indice numerico dello step corrente
 }
 
 export interface StepInfo {

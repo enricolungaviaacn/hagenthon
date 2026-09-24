@@ -17,7 +17,7 @@ export const uploadPdf = async (file: File): Promise<UploadResponse> => {
 };
 
 export const getSessions = async (): Promise<Session[]> => {
-  const res = await client.get<Session[]>('/sessions/');
+  const res = await client.get<Session[]>('/sessions');
   return res.data;
 };
 
@@ -55,6 +55,14 @@ export const submitSession = async (sessionId: string): Promise<SubmitResponse> 
 };
 
 export const getDocuments = async (): Promise<Document[]> => {
-  const res = await client.get<Document[]>('/documents/');
+  const res = await client.get<Document[]>('/documents');
   return res.data;
+};
+
+/**
+ * Restituisce l'URL per visualizzare il PDF originale della sessione.
+ * Il token JWT viene aggiunto automaticamente dall'interceptor axios.
+ */
+export const getPdfUrl = (sessionId: string): string => {
+  return `http://localhost:8080/api/sessions/${sessionId}/pdf`;
 };

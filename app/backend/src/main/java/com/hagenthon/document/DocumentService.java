@@ -2,6 +2,7 @@ package com.hagenthon.document;
 
 import com.hagenthon.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -10,11 +11,13 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentService {
 
     private final UploadedDocumentRepository documentRepository;
 
     public List<Map<String, Object>> listDocuments(User user) {
+        log.debug("DocumentService.listDocuments: recupero documenti per utente={}", user.getEmail());
         return documentRepository.findByUserOrderByUploadedAtDesc(user).stream()
                 .map(doc -> {
                     Map<String, Object> map = new LinkedHashMap<>();
