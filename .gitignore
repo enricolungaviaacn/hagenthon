@@ -6,6 +6,7 @@ app/frontend/.vite/
 
 # Runtime
 data/sessions/
+app/backend/data/
 
 # Marker volatile dell'agente attivo (locale, non committare)
 .claude/active-agent
@@ -13,3 +14,6 @@ data/sessions/
 # Environment
 .env
 *.env.local
+
+# Dati di test — solo per branch feature/test, mai su main/stable
+# Il hook check-test-data.sh blocca il push se questi file vengono committati su main/stable

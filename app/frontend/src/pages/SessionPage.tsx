@@ -14,7 +14,7 @@ export default function SessionPage() {
   const sessionId = id ?? '';
 
   const token = localStorage.getItem('token') ?? '';
-  const pdfUrl = `http://localhost:8080/api/sessions/${sessionId}/pdf`;
+  const pdfUrl = `/api/sessions/${sessionId}/pdf`;
 
   const [step, setStep] = useState<StepInfo | null>(null);
   const [completedSteps, setCompletedSteps] = useState<CompletedStep[]>([]);
@@ -73,7 +73,7 @@ export default function SessionPage() {
   };
 
   const handleDownload = () => {
-    window.open(`http://localhost:8080/api/sessions/${sessionId}/download`, '_blank');
+    window.open(`/api/sessions/${sessionId}/download`, '_blank');
   };
 
   return (
