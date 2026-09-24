@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>730 Facile — Accenture Hagenthon 2026</title>
+  <style>
+    :root {
+      --purple: #A100FF;
+      --purple-light: #BE82FF;
+      --purple-dark: #460073;
+      --bg: #050008;
+      --ink: #0A0014;
+      --rose: #FF50A0;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.65);
+      --card-bg: rgba(161,0,255,0.06);
+      --card-border: rgba(161,0,255,0.25);
+      --radius: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(5,0,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(161,0,255,0.18);
+      padding: 0 40px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--purple-light); }
+    nav .nav-brand {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+      margin-right: auto;
+      background: linear-gradient(90deg, var(--purple-light), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Sections ── */
+    section {
+      padding: 96px 40px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    section:first-of-type { padding-top: 120px; }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 12px;
+    }
+
+    /* ── Gradient titles ── */
+    h1, .gradient-title {
+      background: linear-gradient(90deg, var(--purple-light), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    h1 {
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 32px;
+    }
+    h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+
+    /* ── Cards ── */
+    .card {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px 30px;
+      transition: border-color .25s, transform .25s;
+    }
+    .card:hover {
+      border-color: rgba(161,0,255,0.55);
+      transform: translateY(-3px);
+    }
+
+    /* ── Grid layouts ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .badge-purple { background: rgba(161,0,255,0.18); color: var(--purple-light); border: 1px solid rgba(161,0,255,0.35); }
+    .badge-rose   { background: rgba(255,80,160,0.15); color: #FF82C0; border: 1px solid rgba(255,80,160,0.3); }
+    .badge-green  { background: rgba(0,210,120,0.12); color: #4DFFA0; border: 1px solid rgba(0,210,120,0.3); }
+    .badge-amber  { background: rgba(255,190,0,0.12); color: #FFD04D; border: 1px solid rgba(255,190,0,0.3); }
+
+    /* ── Hero section ── */
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 24px);
+      color: var(--text-muted);
+      margin: 16px 0 32px;
+      max-width: 600px;
+    }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+    .hero-team {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .hero-team strong { color: var(--text); }
+    .hero-divider {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--purple), var(--rose));
+      border-radius: 4px;
+      margin: 48px 0;
+    }
+
+    /* ── Quote ── */
+    blockquote {
+      border-left: 3px solid var(--purple);
+      padding: 18px 24px;
+      background: rgba(161,0,255,0.06);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-style: italic;
+      font-size: 17px;
+      color: var(--text-muted);
+      margin: 24px 0;
+    }
+    blockquote cite {
+      display: block;
+      margin-top: 10px;
+      font-style: normal;
+      font-size: 13px;
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    /* ── Persona card ── */
+    .persona {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 30px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+    }
+    .persona-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .persona-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .persona-meta { font-size: 13px; color: var(--text-muted); }
+
+    /* ── Step flow ── */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 24px 0;
+    }
+    .flow-step {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .flow-arrow {
+      color: var(--purple-light);
+      font-size: 18px;
+      font-weight: 300;
+    }
+
+    /* ── Agent table ── */
+    .agent-table { width: 100%; border-collapse: collapse; }
+    .agent-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(161,0,255,0.2);
+    }
+    .agent-table td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(161,0,255,0.08);
+      vertical-align: top;
+    }
+    .agent-table tr:last-child td { border-bottom: none; }
+    .agent-table tr:hover td { background: rgba(161,0,255,0.05); }
+    .agent-name { font-weight: 700; color: var(--purple-light); font-family: monospace; font-size: 13px; }
+    .model-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .model-sonnet { background: rgba(161,0,255,0.15); color: var(--purple-light); }
+    .model-haiku  { background: rgba(255,80,160,0.12); color: #FF82C0; }
+    .model-opus   { background: rgba(255,190,0,0.12); color: #FFD04D; }
+
+    /* ── Stack columns ── */
+    .stack-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 680px) { .stack-cols { grid-template-columns: 1fr; } }
+    .stack-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(161,0,255,0.2);
+    }
+    .stack-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 14px;
+    }
+    .stack-item:last-child { border-bottom: none; }
+    .stack-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple);
+      flex-shrink: 0;
+    }
+    .stack-item strong { color: var(--text); }
+    .stack-item span { color: var(--text-muted); font-size: 13px; }
+
+    /* ── Voce card ── */
+    .voce-card {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      transition: border-color .25s, transform .25s;
+    }
+    .voce-card:hover {
+      border-color: rgba(161,0,255,0.55);
+      transform: translateY(-3px);
+    }
+    .voce-card .voce-index {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 6px;
+    }
+    .voce-card .voce-name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .voce-card .voce-doc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .voce-card .voce-code {
+      font-family: monospace;
+      font-size: 11px;
+      color: rgba(161,0,255,0.7);
+      margin-bottom: 10px;
+    }
+
+    /* ── Limit cards ── */
+    .limit-card {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px 24px;
+      border: 1px solid rgba(255,80,160,0.2);
+      background: rgba(255,80,160,0.04);
+      border-radius: var(--radius);
+    }
+    .limit-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── Feature highlight ── */
+    .feature-highlight {
+      border-left: 3px solid var(--rose);
+      padding: 18px 24px;
+      background: rgba(255,80,160,0.05);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 16px 0;
+    }
+    .feature-highlight h4 { color: #FF82C0; font-size: 15px; margin-bottom: 6px; }
+
+    /* ── Escalation highlight ── */
+    .escalation-box {
+      border: 1px solid rgba(255,190,0,0.3);
+      background: rgba(255,190,0,0.06);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin: 16px 0;
+    }
+    .escalation-box h4 { color: #FFD04D; font-size: 15px; margin-bottom: 6px; }
+
+    /* ── Architecture diagram ── */
+    .arch-diagram {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(161,0,255,0.2);
+      border-radius: var(--radius);
+      padding: 28px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .arch-diagram .hl { color: var(--purple-light); font-weight: 700; }
+    .arch-diagram .hl2 { color: #FF82C0; }
+    .arch-diagram .hl3 { color: #FFD04D; }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(161,0,255,0.12);
+      margin: 0 40px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim { animation: fadeInUp .6s ease both; }
+    .anim-d1 { animation-delay: .1s; }
+    .anim-d2 { animation-delay: .2s; }
+    .anim-d3 { animation-delay: .3s; }
+    .anim-d4 { animation-delay: .4s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      section { padding: 72px 20px 60px; }
+      nav { padding: 0 20px; gap: 16px; }
+      nav a.hide-mobile { display: none; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 48px 40px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid rgba(161,0,255,0.1);
+    }
+    footer strong { color: var(--purple-light); }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <span class="nav-brand">730 Facile</span>
+  <a href="#problema" class="hide-mobile">Il problema</a>
+  <a href="#soluzione" class="hide-mobile">La soluzione</a>
+  <a href="#voci" class="hide-mobile">Le voci</a>
+  <a href="#flusso" class="hide-mobile">Flusso</a>
+  <a href="#architettura" class="hide-mobile">Architettura</a>
+  <a href="#stack" class="hide-mobile">Stack</a>
+  <a href="#limiti">Limiti</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 1 — HERO
+     ══════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="anim">
+    <div class="section-label">Accenture Hagenthon 2026 · Accessibilità Digitale</div>
+  </div>
+  <h1 class="anim anim-d1">730<br>Facile</h1>
+  <p class="hero-sub anim anim-d2">
+    Assistente digitale per la dichiarazione dei redditi
+  </p>
+  <div class="hero-badges anim anim-d3">
+    <span class="badge badge-purple">Accenture Hagenthon 2026</span>
+    <span class="badge badge-rose">Accessibilità Digitale</span>
+  </div>
+  <div class="hero-team anim anim-d4">
+    <strong>Team:</strong> Giuliana Russo &nbsp;·&nbsp; Enrico Lungavia
+  </div>
+  <div class="hero-divider"></div>
+  <div class="grid-3 anim anim-d4">
+    <div class="card">
+      <h3>12 step guidati</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">
+        Dati anagrafici + 5 voci fiscali con confronto documenti + addizionale automatica
+      </p>
+    </div>
+    <div class="card">
+      <h3>Nessun gergo tecnico</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">
+        Ogni campo spiegato in linguaggio semplice, con messaggi chiari e bottoni grandi
+      </p>
+    </div>
+    <div class="card">
+      <h3>Escalation CAF</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">
+        Dopo 3 tentativi falliti su una voce, l'assistente suggerisce il CAF automaticamente
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 2 — IL PROBLEMA
+     ══════════════════════════════════════════════ -->
+<section id="problema">
+  <div class="section-label">Il problema</div>
+  <h2 class="gradient-title">Il 730 precompilato non è per tutti</h2>
+
+  <div class="persona">
+    <div class="persona-avatar">👵</div>
+    <div>
+      <div class="persona-name">Maria, 72 anni — pensionata</div>
+      <div class="persona-meta">Riceve ogni anno il 730 precompilato dall'INPS, ma non sa come verificarlo da sola</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="card">
+      <h3>Cosa non riesce a fare da sola</h3>
+      <ul style="margin-top:12px;padding-left:20px;color:var(--text-muted);font-size:15px;line-height:2;">
+        <li>Capire quali campi del PDF riguardano la pensione</li>
+        <li>Trovare e confrontare la Certificazione Unica INPS</li>
+        <li>Verificare se le spese mediche sono state recepite</li>
+        <li>Capire cosa fare se un valore è diverso da quello atteso</li>
+        <li>Decidere se accettare il precompilato o correggerlo</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Il contesto</h3>
+      <p style="color:var(--text-muted);font-size:15px;line-height:1.8;margin-top:8px;">
+        L'Agenzia delle Entrate mette a disposizione il 730 precompilato online, ma la
+        piattaforma presuppone familiarità con terminologia fiscale, navigazione web
+        avanzata e capacità di confronto autonomo dei documenti.
+        Per molti pensionati, il percorso naturale resta il CAF fisico — con attese,
+        spostamenti e costi che potrebbero essere evitati per i casi più semplici.
+      </p>
+    </div>
+  </div>
+
+  <blockquote>
+    "Ogni anno mia figlia mi porta tutti i documenti al CAF. Ci vuole quasi mezza giornata.
+    Non capisco perché nel foglio ci siano tutti questi numeri: non so quale è giusto e quale sbagliato.
+    Mi basta sapere se va bene o se c'è qualcosa da sistemare."
+    <cite>— Maria, 72 anni, pensionata</cite>
+  </blockquote>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 3 — LA SOLUZIONE
+     ══════════════════════════════════════════════ -->
+<section id="soluzione">
+  <div class="section-label">La soluzione</div>
+  <h2 class="gradient-title">Un assistente passo per passo</h2>
+
+  <div class="grid-3" style="margin-bottom:32px;">
+    <div class="card">
+      <h3>Guida voce per voce</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:8px;">
+        L'applicazione accompagna Maria attraverso ogni campo del 730 — prima i dati
+        anagrafici (MANUAL_ENTRY), poi le voci fiscali che richiedono un documento
+        di confronto (DOCUMENT_UPLOAD), infine le voci calcolate automaticamente
+        (AUTOMATIC).
+      </p>
+    </div>
+    <div class="card">
+      <h3>Confronto automatico</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:8px;">
+        Maria carica il documento di verifica (CU INPS, fatture mediche, certificato
+        banca). Il backend estrae il valore con Apache PDFBox e lo confronta con quello
+        nel 730. Il risultato è sempre in italiano semplice: "Tutto corrisponde" oppure
+        "Abbiamo trovato due valori diversi".
+      </p>
+    </div>
+    <div class="card">
+      <h3>Riepilogo scaricabile</h3>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:8px;">
+        Al termine della sessione, il backend genera un riepilogo HTML con tutti i valori
+        confermati da Maria (via <code style="font-size:12px;color:var(--purple-light);">SummaryGeneratorService</code>),
+        scaricabile per conservazione o da mostrare a un consulente.
+      </p>
+    </div>
+  </div>
+
+  <div class="feature-highlight">
+    <h4>Feature distintiva — "Mostra nel documento"</h4>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+      Il componente <code style="color:var(--purple-light);">PdfViewer.tsx</code> usa
+      <strong>PDF.js (pdfjs-dist)</strong> per renderizzare il 730 direttamente nel browser.
+      L'agente <em>pdf-analyzer</em> estrae le coordinate bounding box di ogni sezione:
+      quando Maria arriva a una voce, la sezione corrispondente nel PDF viene evidenziata
+      in giallo, così sa esattamente dove guardare nel documento.
+    </p>
+  </div>
+
+  <div class="escalation-box">
+    <h4>Escalation automatica al CAF</h4>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+      Ogni voce tiene traccia dei tentativi. Dopo
+      <strong style="color:#FFD04D;">3 tentativi falliti</strong> su una singola voce,
+      l'orchestratore attiva l'escalation: suggerisce a Maria di rivolgersi a un CAF
+      per quella voce specifica e avanza automaticamente alla successiva.
+      Questa regola è definita in <code style="color:var(--purple-light);">Session730Service.java</code>
+      e documentata nel workflow agentico.
+    </p>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 4 — LE 5 VOCI GESTITE
+     ══════════════════════════════════════════════ -->
+<section id="voci">
+  <div class="section-label">Le voci gestite</div>
+  <h2 class="gradient-title">5 voci fiscali + dati anagrafici</h2>
+  <p style="color:var(--text-muted);margin-bottom:32px;max-width:700px;">
+    <code>TrecentoStep.java</code> definisce 12 step totali: 6 dati anagrafici
+    (inserimento manuale), 5 voci fiscali con verifica documentale, 1 voce automatica.
+    Qui di seguito le 5 voci fiscali principali.
+  </p>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+
+    <div class="voce-card">
+      <div class="voce-index">PENSIONE_INPS · indice 6</div>
+      <div class="voce-name">Pensione INPS</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        CU – Certificazione Unica
+      </div>
+      <div class="voce-code">Keywords: "pensione", "redditi da pensione", "RC1"</div>
+      <span class="badge badge-purple">Caricamento documento</span>
+    </div>
+
+    <div class="voce-card">
+      <div class="voce-index">REDDITO_LAVORO_DIPENDENTE · indice 7</div>
+      <div class="voce-name">Reddito da lavoro dipendente</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        Busta paga o CU del datore di lavoro
+      </div>
+      <div class="voce-code">Keywords: "reddito lavoro dipendente", "RC1"</div>
+      <span class="badge badge-purple">Caricamento documento</span>
+    </div>
+
+    <div class="voce-card">
+      <div class="voce-index">SPESE_MEDICHE · indice 8</div>
+      <div class="voce-name">Spese mediche</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        Fatture, scontrini parlanti o precompilato SSN
+      </div>
+      <div class="voce-code">Keywords: "spese sanitarie", "RP1"</div>
+      <span class="badge badge-purple">Caricamento documento</span>
+    </div>
+
+    <div class="voce-card">
+      <div class="voce-index">INTERESSI_MUTUO · indice 9</div>
+      <div class="voce-name">Interessi passivi sul mutuo</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        Certificato annuale della banca
+      </div>
+      <div class="voce-code">Keywords: "interessi mutuo", "RP7"</div>
+      <span class="badge badge-purple">Caricamento documento</span>
+    </div>
+
+    <div class="voce-card">
+      <div class="voce-index">DETRAZIONE_FAMILIARI · indice 10</div>
+      <div class="voce-name">Familiari a carico</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        Documento d'identità del familiare
+      </div>
+      <div class="voce-code">Keywords: "familiari a carico", "RC6"</div>
+      <span class="badge badge-purple">Caricamento documento</span>
+    </div>
+
+    <div class="voce-card">
+      <div class="voce-index">ADDIZIONALE · indice 11</div>
+      <div class="voce-name">Addizionale comunale e regionale</div>
+      <div class="voce-doc">
+        <strong style="color:var(--text);">Documento richiesto:</strong><br>
+        Nessuno — calcolata automaticamente dal 730
+      </div>
+      <div class="voce-code">Step automatico — nessuna azione utente richiesta</div>
+      <span class="badge badge-green">Automatica</span>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>Dati anagrafici (6 step MANUAL_ENTRY)</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+      <span class="badge badge-amber">Nome e Cognome</span>
+      <span class="badge badge-amber">Data di nascita</span>
+      <span class="badge badge-amber">Codice fiscale</span>
+      <span class="badge badge-amber">Sesso</span>
+      <span class="badge badge-amber">Comune di nascita</span>
+      <span class="badge badge-amber">Domicilio</span>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:12px;">
+      Per questi step Maria inserisce il valore manualmente; il backend lo confronta
+      con quello estratto dal PDF via <code>computeComparison()</code> in
+      <code>Session730Service.java</code> (normalizzazione trim + uppercase + collasso spazi).
+    </p>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 5 — COME FUNZIONA (FLUSSO)
+     ══════════════════════════════════════════════ -->
+<section id="flusso">
+  <div class="section-label">Come funziona</div>
+  <h2 class="gradient-title">Il flusso applicativo</h2>
+
+  <div class="flow" style="margin-bottom:32px;">
+    <span class="flow-step">1. Upload PDF 730</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">2. Analisi voci</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">3. Step 1…N</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">4. Confronto documenti</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-step">5. Riepilogo</span>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>1. Upload PDF 730 <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— POST /api/sessions/upload-730</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Maria carica il PDF del suo 730. Il backend lo salva su disco (path univoco con UUID),
+          estrae il testo con <strong>Apache PDFBox</strong> via <code>PdfAnalyzerService</code>,
+          e analizza le 5 voci con <code>DocumentDataExtractor</code>.
+          Viene creata una sessione (<code>Session730</code>) con stato JSON e index step a 0.
+          Gli step automatici vengono saltati immediatamente.
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>2. Step corrente <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— GET /current-step</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Il frontend (<code>SessionPage.tsx</code>) carica lo step attuale e decide
+          quale componente mostrare: <code>StepWizard.tsx</code> gestisce i tre casi
+          MANUAL_ENTRY, DOCUMENT_UPLOAD e AUTOMATIC con interfacce diverse,
+          tutte ottimizzate per utenti anziani (font grandi, bottoni alti 52px+, testi semplici).
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>3. Inserimento manuale <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— POST /submit-manual-value</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Per i dati anagrafici Maria digita il valore. Il backend lo confronta
+          con quello estratto dal 730 senza avanzare allo step:
+          l'utente vede prima il risultato del confronto nel componente
+          <code>ComparisonView.tsx</code>, poi conferma (o corregge) esplicitamente.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>4. Caricamento documento <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— POST /upload-document</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Per le voci fiscali Maria carica il documento di verifica.
+          Il backend estrae il valore con PDFBox (o usa il nome file come fallback
+          se il testo è vuoto), lo confronta con il 730 e restituisce
+          <code>extractedValue</code>, <code>value730</code> e <code>comparison</code>
+          (OK / MISMATCH / PENDING).
+        </p>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>5. Conferma step <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— POST /confirm-step</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Maria sceglie quale valore usare (730, documento, o un valore personalizzato).
+          Il backend salva il valore confermato in <code>stepsData</code> (JSON),
+          marca il documento come confermato nel DB, avanza l'indice,
+          salta step automatici, e ritorna il nome dello step successivo.
+        </p>
+      </div>
+      <div class="card">
+        <h3>6. Riepilogo e download <span style="color:var(--purple-light);font-size:13px;font-weight:400;">— GET /summary + /download</span></h3>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:8px;line-height:1.7;">
+          Completati tutti gli step, Maria può scaricare il riepilogo HTML generato da
+          <code>SummaryGeneratorService.java</code>: una tabella con tutti i 12 campi,
+          il valore confermato per ciascuno e un disclaimer obbligatorio che ricorda
+          di verificare con un professionista prima della presentazione definitiva.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 6 — ARCHITETTURA AGENTICA
+     ══════════════════════════════════════════════ -->
+<section id="architettura">
+  <div class="section-label">Architettura agentica</div>
+  <h2 class="gradient-title">Agenti di sviluppo e agenti runtime</h2>
+
+  <p style="color:var(--text-muted);margin-bottom:28px;max-width:720px;">
+    Il progetto usa due livelli agentici: gli agenti di <strong>sviluppo</strong>
+    (usati durante la costruzione dell'applicazione, definiti in <code>.claude/agents/</code>)
+    e gli agenti <strong>runtime</strong> (usati dall'applicazione a tempo di esecuzione,
+    documentati in <code>agents/workflow.md</code>).
+  </p>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+
+    <!-- Agenti di sviluppo -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:16px;">Agenti di sviluppo</div>
+      <table class="agent-table">
+        <thead>
+          <tr>
+            <th>Agente</th>
+            <th>Modello</th>
+            <th>Ruolo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="agent-name">agent-lead</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Hub centrale; coordina l'intero ciclo requirements → developer → test → build</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">requirements-definer</span></td>
+            <td><span class="model-tag model-opus">Opus 5.5</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Struttura requisiti, user stories, mockup testuale, voce di Maria</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">requirement-analyzer</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Analisi tecnica, edge cases, dipendenze, test JUnit nominati</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">backend-developer</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Implementazione Spring Boot / Java 21 (test-first obbligatorio)</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">frontend-developer</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Implementazione React 18 / TypeScript, accessibilità utenti anziani</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">ux-tester-elderly</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Simula Maria: rileva problemi bloccanti, fastidiosi, miglioramenti UX</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Agenti runtime -->
+    <div class="card">
+      <div class="section-label" style="margin-bottom:16px;">Agenti runtime (applicazione)</div>
+      <table class="agent-table">
+        <thead>
+          <tr>
+            <th>Agente</th>
+            <th>Modello</th>
+            <th>Ruolo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="agent-name">Orchestratore</span></td>
+            <td><span class="model-tag model-sonnet">Sonnet 4.6</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Flusso conversazionale, coordinamento subagenti, stato sessione</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">pdf-analyzer</span></td>
+            <td><span class="model-tag model-haiku">Haiku 4.5</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Estrae 5 voci con coordinate bounding box dal PDF 730</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">document-comparator</span></td>
+            <td><span class="model-tag model-haiku">Haiku 4.5</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Confronta valore utente vs precompilato: OK / ATTENZIONE / ESCALATION_CAF</td>
+          </tr>
+          <tr>
+            <td><span class="agent-name">memory-manager</span></td>
+            <td><span class="model-tag model-haiku">Haiku 4.5</span></td>
+            <td style="color:var(--text-muted);font-size:13px;">Traccia documenti caricati, evita duplicati, costruisce riepilogo finale</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:16px;">Principio architetturale</h3>
+    <div class="arch-diagram"><span class="hl">                    [ORCHESTRATORE — Sonnet 4.6]</span>
+                    Legge CLAUDE.md all'avvio
+                           |
+          _________________|_________________
+         |          |           |            |
+         v          v           v            v
+  <span class="hl2">[pdf-analyzer] [doc-comparator] [memory-mgr]</span>   <span class="hl3">[agent-lead]</span>
+   Haiku 4.5      Haiku 4.5    Haiku 4.5    Sonnet 4.6
+  estrazione     confronto     stato        sviluppo
+  bbox + testo   OK/MISM/CAF   sessione     workflow</div>
+    <p style="color:var(--text-muted);font-size:13px;margin-top:14px;line-height:1.7;">
+      Nessun subagente comunica direttamente con un altro: tutto passa attraverso l'Orchestratore.
+      Il tiering modelli (Sonnet per coordinamento, Haiku per task veloci) ottimizza costo e latenza.
+      Ogni nuova feature segue il ciclo enforced da hook Git:
+      <strong style="color:var(--text);">feature → PR test → PR stable → PR main</strong>.
+    </p>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 7 — STACK TECNICO
+     ══════════════════════════════════════════════ -->
+<section id="stack">
+  <div class="section-label">Stack tecnico</div>
+  <h2 class="gradient-title">Tecnologie reali del progetto</h2>
+
+  <div class="stack-cols">
+
+    <!-- Backend -->
+    <div class="card">
+      <div class="stack-col-title">Backend — Java / Spring Boot</div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Java 21</strong> <span>LTS · Record, sealed classes, virtual threads</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Spring Boot 3</strong> <span>Web, Security, Data JPA, Validation</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Spring Security 6 + JWT</strong> <span>Ogni endpoint protetto da @AuthenticationPrincipal</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Apache PDFBox</strong> <span>Estrazione testo e coordinate dal PDF 730</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>JPA / Hibernate</strong> <span>Entità Session730, UploadedDocument, User</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Jackson</strong> <span>Stato sessione serializzato in JSON su DB</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Lombok</strong> <span>@Slf4j, @RequiredArgsConstructor su tutti i Service</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>Maven 3.9</strong> <span>Build tool con Maven Wrapper incluso</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>JUnit 5 + Mockito</strong> <span>90% branch coverage minima su codice nuovo</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div><strong>ANTHROPIC_API_KEY</strong> <span>Solo variabile d'ambiente — mai in chiaro nel codice</span></div>
+      </div>
+    </div>
+
+    <!-- Frontend -->
+    <div class="card">
+      <div class="stack-col-title">Frontend — React / TypeScript</div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>React 18</strong> <span>Functional components + hooks, nessuna class component</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>TypeScript</strong> <span>Strict mode, zero any non giustificati</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>Vite</strong> <span>Build tool + proxy dev server verso porta 8080</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>PDF.js (pdfjs-dist)</strong> <span>Rendering PDF a canvas, scala 1.4, highlight sezioni</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>Axios</strong> <span>Client HTTP con interceptor JWT automatico</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>React Router DOM</strong> <span>Routing SPA: Login, Register, Dashboard, Session</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>Node.js 20+</strong> <span>Prerequisito runtime e toolchain</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>UX senior-first</strong> <span>Font min 16px, bottoni min 44px, errori in italiano semplice</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>localStorage</strong> <span>Token JWT e dati utente (chiavi: token, user)</span></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot" style="background:var(--rose);"></div>
+        <div><strong>Claude Sonnet/Haiku</strong> <span>Modelli via SDK Anthropic (orchestratore + subagenti)</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════
+     SEZIONE 8 — LIMITI E CONSIDERAZIONI
+     ══════════════════════════════════════════════ -->
+<section id="limiti">
+  <div class="section-label">Limiti e considerazioni</div>
+  <h2 class="gradient-title">Cosa l'assistente non fa (e non deve fare)</h2>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+
+    <div class="limit-card">
+      <div class="limit-icon">📄</div>
+      <div>
+        <h3 style="margin-bottom:6px;">Solo PDF con testo selezionabile</h3>
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+          Il parsing si basa su <strong>Apache PDFBox</strong> per l'estrazione testuale.
+          I PDF ottenuti tramite scansione (immagini) non contengono testo selezionabile
+          e non vengono elaborati correttamente. È necessario usare il PDF digitale
+          scaricato direttamente dal sito dell'Agenzia delle Entrate o dell'INPS.
+        </p>
+      </div>
+    </div>
+
+    <div class="limit-card">
+      <div class="limit-icon">🏛️</div>
+      <div>
+        <h3 style="margin-bottom:6px;">Non sostituisce il CAF</h3>
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+          730 Facile è uno strumento di <em>assistenza alla verifica</em>, non di consulenza
+          fiscale. Il riepilogo generato da <code>SummaryGeneratorService</code> include
+          un disclaimer obbligatorio che invita a rivolgersi a un professionista fiscale
+          qualificato per la presentazione definitiva. L'assistente non fornisce mai
+          cifre definitive: usa sempre formule come "sembra corrispondere" o "c'è una differenza".
+        </p>
+      </div>
+    </div>
+
+    <div class="limit-card">
+      <div class="limit-icon">🔒</div>
+      <div>
+        <h3 style="margin-bottom:6px;">Dati in locale — nessun invio esterno</h3>
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+          I PDF caricati da Maria vengono salvati su disco locale del server (path configurato
+          via variabile d'ambiente <code>app.upload.dir</code>). L'unica variabile esterna
+          è <code>ANTHROPIC_API_KEY</code> — mai hardcodata nel codice, controllata da hook Git.
+          Nessun documento viene inviato a servizi terzi al di là dell'API Anthropic.
+        </p>
+      </div>
+    </div>
+
+    <div class="limit-card">
+      <div class="limit-icon">⚠️</div>
+      <div>
+        <h3 style="margin-bottom:6px;">Disclaimer obbligatorio all'avvio</h3>
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
+          Ogni sessione inizia con un disclaimer CAF obbligatorio — regola definita in
+          <code>CLAUDE.md</code> e applicata dall'orchestratore. Per le voci più complesse
+          (o dopo 3 tentativi falliti) l'escalation al CAF viene sempre suggerita
+          prima di procedere, rendendo esplicito il limite dello strumento.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3>Riepilogo del perimetro di utilizzo consigliato</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:16px;">
+      <div>
+        <div style="color:var(--purple-light);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Adatto per</div>
+        <ul style="padding-left:18px;color:var(--text-muted);font-size:14px;line-height:2;">
+          <li>Pensionati con 730 semplice</li>
+          <li>Verifica pensione INPS + CU</li>
+          <li>Controllo spese mediche SSN</li>
+          <li>Familiari a carico</li>
+          <li>Primo orientamento sui dati</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color:#FF82C0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Richiede CAF per</div>
+        <ul style="padding-left:18px;color:var(--text-muted);font-size:14px;line-height:2;">
+          <li>Situazioni fiscali complesse</li>
+          <li>Redditi da più fonti</li>
+          <li>PDF scansionati (non digitali)</li>
+          <li>Tre o più tentativi falliti</li>
+          <li>Decisione finale di presentazione</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div style="margin-bottom:8px;">
+    <strong>730 Facile</strong> &nbsp;·&nbsp; Accenture Hagenthon 2026 &nbsp;·&nbsp; Accessibilità Digitale
+  </div>
+  <div>Giuliana Russo &nbsp;·&nbsp; Enrico Lungavia</div>
+  <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.3);">
+    Presentazione generata dal codebase reale &nbsp;·&nbsp; Dati da TrecentoStep.java, Session730Service.java, agents/workflow.md
+  </div>
+</footer>
+
+</body>
+</html>
