@@ -459,9 +459,9 @@
       </p>
     </div>
     <div class="card">
-      <h3>Nessun dato esce dal computer</h3>
+      <h3>Progettato per chi non usa il digitale ogni giorno</h3>
       <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">
-        Estrazione e confronto avvengono in locale: nessun documento viene inviato a servizi esterni
+        Bottoni grandi, linguaggio semplice, zero termini tecnici: pensato per Maria, funziona per tutti
       </p>
     </div>
   </div>
@@ -946,7 +946,7 @@ in parallelo            su tutti i commit        avvio su 8080
       </div>
       <div class="stack-item">
         <div class="stack-dot"></div>
-        <div><strong>H2 su file</strong> <span>Utenti, sessioni e documenti caricati — nessun server esterno</span></div>
+        <div><strong>H2 su file</strong> <span>Utenti, sessioni e documenti caricati</span></div>
       </div>
     </div>
 
@@ -1039,13 +1039,12 @@ in parallelo            su tutti i commit        avvio su 8080
     <div class="limit-card">
       <div class="limit-icon">🔒</div>
       <div>
-        <h3 style="margin-bottom:6px;">Dati in locale — nessun invio esterno</h3>
+        <h3 style="margin-bottom:6px;">Gestione documenti</h3>
         <p style="color:var(--text-muted);font-size:14px;line-height:1.7;">
-          I PDF caricati da Maria restano sul disco del server (path configurato via
-          <code>app.upload.dir</code>) e i dati in un database H2 su file. L'estrazione avviene
-          in locale con PDFBox e regole di pattern matching:
-          <strong style="color:var(--text);">nessun documento viene inviato ad alcun servizio esterno</strong>,
-          e l'applicazione non richiede credenziali verso terze parti per funzionare.
+          I PDF caricati da Maria vengono archiviati sul server (path configurato via
+          <code>app.upload.dir</code>) e i metadati di sessione in un database H2 su file.
+          L'estrazione del testo avviene con Apache PDFBox; l'interpretazione semantica
+          delle voci è affidata a Claude Haiku tramite API Anthropic.
         </p>
       </div>
     </div>
