@@ -1,0 +1,96 @@
+MODELLO 730 – DICHIARAZIONE DEI REDDITI 2025
+(anno d'imposta 2024) — Precompilato dall'Agenzia delle Entrate
+FRONTESPIZIO – DATI DEL DICHIARANTE
+Cognome e nome
+ROSSI MARIA
+Data di nascita
+14/03/1953
+Sesso
+F
+Codice fiscale
+RSSMRA53C54H501Z
+Comune di nascita
+ROMA
+Provincia
+RM
+Domicilio fiscale al 1° gennaio 2024 – Via e numero
+VIA APPIA NUOVA, 42
+CAP
+00183
+Comune
+ROMA
+Provincia
+RM
+Codice comune
+H501
+Dichiarazione predisposta dall'Agenzia delle Entrate sulla base delle informazioni disponibili al 30/04/2025. Il contribuente può accettare, modificare o integrare i dati
+precompilati.
+QUADRO RC – Redditi di lavoro dipendente e assimilati (Pensioni)
+Dati del sostituto d'imposta (INPS)
+Denominazione sostituto
+ISTITUTO NAZIONALE PREVIDENZA SOCIALE – INPS
+Codice fiscale sostituto
+80078750587
+RC1 – Reddito da pensione INPS
+RC1
+col.1 Tipologia reddito (1=pensione) 1
+RC1
+col.2 Numero giorni lavoro/pensione 365
+RC1
+col.3 Reddito da pensione – Importo lordo annuo (€) 18.500,00
+RC1
+col.4 Ritenute IRPEF operate dal sostituto 2.960,00
+RC1
+col.5 Ritenute addizionale regionale 370,00
+RC1
+col.6 Ritenute addizionale comunale acconto 166,50
+Fonte: Certificazione Unica 2025 trasmessa da INPS in data 28/02/2025
+QUADRO RP – Oneri e spese (detrazioni 19%)
+RP1 – Spese sanitarie
+RP1 Spese mediche e di assistenza specifica (scontrini, fatture medici, farmaci) 1.200,00
+RP2 Spese mediche per portatori di handicap 0,00
+Fonte: Sistema Tessera Sanitaria – dati trasmessi da farmacie e medici. Importo già al netto della franchigia di € 129,11. Detrazione spettante: 19% di € 1.070,89 = € 203,47
+RP7 – Interessi passivi su mutui
+RP7 Interessi passivi su mutuo ipotecario per acquisto abitazione principale 3.800,00
+RP8 Altri interessi passivi 0,00
+Fonte: certificazione interessi trasmessa da Banca Popolare di Roma (cod. fisc. 01234567890). Detrazione spettante: 19% di € 3.800,00 = € 722,00 (max imponibile €
+4.000,00)
+QUADRO RC – Sezione II: Familiari a carico
+Rigo Relazione Codice fiscale familiare Mesi a carico % detrazione Detrazione spettante (€)
+RC6 – F1 Coniuge RSSMRA53C54H501Z 12 100% 690,00
+RC6 – F2 Figlio (1°) RSSLCU80A01H501X 12 50% 475,00
+Coniuge: ROSSI MARIO, nato il 22/07/1950, CF RSSMRA50L22H501K — non titolare di redditi propri.
+Figlio: ROSSI LUCA, nato il 01/01/1980, a carico al 50% (altro 50% dichiarato dall'altro genitore).
+QUADRO RV – Addizionale regionale e comunale IRPEF
+Addizionale regionale
+RV1 Regione di domicilio al 1° gennaio 2024 LAZIO (RM)
+RV2 Addizionale regionale dovuta (aliquota 1,73%) 320,05
+Addizionale comunale
+RV3 Comune di domicilio al 1° gennaio 2024 ROMA (H501)
+RV4 Addizionale comunale saldo (aliquota 0,9%) 166,50
+RV5 Acconto addizionale comunale 2025 (30%) 49,95
+Calcolata automaticamente sulla base del reddito imponibile e delle aliquote deliberate dal comune di Roma per l'anno 2024.
+RIEPILOGO LIQUIDAZIONE IRPEF
+Reddito complessivo (RC1) 18.500,00
+9/24/26, 2:06 PM 730 Precompilato 2025 – Fac Simile
+file:///C:/Users/giuliana.russo/AppData/Local/Temp/hagenthon-setup/test-data/730_fac_simile.html 1/2
+Detrazione pensione art.13 TUIR 1.725,00
+IRPEF lorda (aliquote progressive) 3.330,00
+Detrazione familiari a carico 1.165,00
+Detrazione spese mediche (19%) 203,47
+Detrazione interessi mutuo (19%) 722,00
+IRPEF netta dovuta 1.239,53
+Ritenute operate da INPS 2.960,00
+A RIMBORSO (colonna 1 mod. 730-3) 1.720,47
+Firma del dichiarante Data
+_______ / _______ /
+2025
+Dichiaro, sotto la mia responsabilità, che i dati
+indicati nel presente modello corrispondono al
+vero. Il presente modello è precompilato
+dall'Agenzia delle Entrate ai sensi dell'art. 1 del
+D.Lgs. 175/2014.
+FAC SIMILE – Dati fittizi a scopo dimostrativo – Non valido ai fini fiscali
+Modello 730/2025 – Periodo d'imposta 2024 – Cod. mod. 730-1 rev. 2025
+9/24/26, 2:06 PM 730 Precompilato 2025 – Fac Simile
+file:///C:/Users/giuliana.russo/AppData/Local/Temp/hagenthon-setup/test-data/730_fac_simile.html 2/2
