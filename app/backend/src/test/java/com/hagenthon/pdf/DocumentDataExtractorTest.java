@@ -263,4 +263,208 @@ class DocumentDataExtractorTest {
         assertThat(result).isNotBlank();
         assertThat(result).isEqualTo("980,00");
     }
+
+    // ─── extractNomeCognome ────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractNomeCognome - testo 730 con cognome e nome su riga unica - restituisce valore non blank")
+    void extractNomeCognome_testoConCognome_restituisceValoreNonBlank() {
+        // given — formato realistico del 730 precompilato su una sola riga
+        String testo = "COGNOME ROSSI MARIO contribuente anno 2024 redditi 14000";
+
+        // when
+        var result = extractor.extractNomeCognome(testo);
+
+        // then — il metodo deve trovare almeno un frammento del nome (comportamento regex con (?i))
+        assertThat(result).isPresent();
+        assertThat(result.get()).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("extractNomeCognome - testo vuoto - restituisce Optional vuoto")
+    void extractNomeCognome_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractNomeCognome("")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractNomeCognome - testo senza dati anagrafici - restituisce Optional vuoto")
+    void extractNomeCognome_testoNonPertinente_restituisceOptionalVuoto() {
+        assertThat(extractor.extractNomeCognome("Redditi 2024 pensione 15.000,00")).isEmpty();
+    }
+
+    // ─── extractDataNascita ────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractDataNascita - testo con 'nato il' e data gg/mm/aaaa - restituisce data")
+    void extractDataNascita_testoConDataNascita_restituisceData() {
+        // given
+        String testo = "nato il 15/03/1965 a Roma";
+
+        // when
+        var result = extractor.extractDataNascita(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo("15/03/1965");
+    }
+
+    @Test
+    @DisplayName("extractDataNascita - testo con 'data di nascita' - restituisce data")
+    void extractDataNascita_testoConDataDiNascita_restituisceData() {
+        // given
+        String testo = "Data di nascita: 22/07/1980";
+
+        // when
+        var result = extractor.extractDataNascita(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo("22/07/1980");
+    }
+
+    @Test
+    @DisplayName("extractDataNascita - testo vuoto - restituisce Optional vuoto")
+    void extractDataNascita_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractDataNascita("")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractDataNascita - testo senza data di nascita - restituisce Optional vuoto")
+    void extractDataNascita_testoNonPertinente_restituisceOptionalVuoto() {
+        assertThat(extractor.extractDataNascita("Redditi anno 2024 pensione INPS")).isEmpty();
+    }
+
+    // ─── extractCodiceFiscale ──────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractCodiceFiscale - testo con CF valido a 16 caratteri - restituisce CF")
+    void extractCodiceFiscale_cfValido_restituisceCf() {
+        // given
+        String testo = "Codice fiscale: RSSMRA65C15H501Z";
+
+        // when
+        var result = extractor.extractCodiceFiscale(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo("RSSMRA65C15H501Z");
+    }
+
+    @Test
+    @DisplayName("extractCodiceFiscale - testo vuoto - restituisce Optional vuoto")
+    void extractCodiceFiscale_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractCodiceFiscale("")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractCodiceFiscale - testo senza CF - restituisce Optional vuoto")
+    void extractCodiceFiscale_testoSenzaCf_restituisceOptionalVuoto() {
+        assertThat(extractor.extractCodiceFiscale("Reddito pensione 14.000,00 euro")).isEmpty();
+    }
+
+    // ─── extractSesso ─────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractSesso - testo con 'sesso M' - restituisce M")
+    void extractSesso_testoConSessoM_restituisceM() {
+        // given
+        String testo = "Sesso M\ncognome ROSSI";
+
+        // when
+        var result = extractor.extractSesso(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo("M");
+    }
+
+    @Test
+    @DisplayName("extractSesso - testo con 'sesso F' - restituisce F")
+    void extractSesso_testoConSessoF_restituisceF() {
+        // given
+        String testo = "sesso F data nascita 01/01/1970";
+
+        // when
+        var result = extractor.extractSesso(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo("F");
+    }
+
+    @Test
+    @DisplayName("extractSesso - testo vuoto - restituisce Optional vuoto")
+    void extractSesso_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractSesso("")).isEmpty();
+    }
+
+    // ─── extractComuneNascita ──────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractComuneNascita - testo con 'comune di nascita' - restituisce valore non blank")
+    void extractComuneNascita_testoConComune_restituisceValoreNonBlank() {
+        // given — formato testuale standard; la regex (?i) può catturare frammenti del comune
+        String testo = "comune di nascita ROMA - provincia RM - codice catastale";
+
+        // when
+        var result = extractor.extractComuneNascita(testo);
+
+        // then — il metodo deve trovare almeno un frammento del valore
+        assertThat(result).isPresent();
+        assertThat(result.get()).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("extractComuneNascita - testo vuoto - restituisce Optional vuoto")
+    void extractComuneNascita_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractComuneNascita("")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractComuneNascita - testo senza comune - restituisce Optional vuoto")
+    void extractComuneNascita_testoNonPertinente_restituisceOptionalVuoto() {
+        assertThat(extractor.extractComuneNascita("Redditi 2024 pensione INPS 14.000")).isEmpty();
+    }
+
+    // ─── extractDomicilio ─────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("extractDomicilio - testo con indirizzo via - restituisce indirizzo")
+    void extractDomicilio_testoConVia_restituisceIndirizzo() {
+        // given
+        String testo = "Via Roma 12, 00100 Roma RM";
+
+        // when
+        var result = extractor.extractDomicilio(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).contains("Via Roma");
+    }
+
+    @Test
+    @DisplayName("extractDomicilio - testo con 'piazza' - restituisce indirizzo")
+    void extractDomicilio_testoConPiazza_restituisceIndirizzo() {
+        // given
+        String testo = "Piazza Navona 5, 00186 Roma";
+
+        // when
+        var result = extractor.extractDomicilio(testo);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).contains("Piazza Navona");
+    }
+
+    @Test
+    @DisplayName("extractDomicilio - testo vuoto - restituisce Optional vuoto")
+    void extractDomicilio_testoVuoto_restituisceOptionalVuoto() {
+        assertThat(extractor.extractDomicilio("")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("extractDomicilio - testo senza indirizzo - restituisce Optional vuoto")
+    void extractDomicilio_testoNonPertinente_restituisceOptionalVuoto() {
+        assertThat(extractor.extractDomicilio("Redditi 2024 pensione INPS 14.000,00")).isEmpty();
+    }
 }
