@@ -31,7 +31,9 @@ public class ClaudeService {
     }
 
     public Map<String, String> analyzePdf730(String pdfText) {
+        log.info("analyzePdf730: analisi testo di {} caratteri", pdfText == null ? 0 : pdfText.length());
         if (pdfText == null || pdfText.isBlank()) {
+            log.warn("analyzePdf730: testo PDF vuoto, restituzione mappa vuota");
             return Collections.emptyMap();
         }
         String prompt = """
@@ -60,7 +62,9 @@ public class ClaudeService {
     }
 
     public String extractValueFromDocument(String documentText, String fieldName, String documentType) {
+        log.info("extractValueFromDocument: campo={} tipoDoc={}", fieldName, documentType);
         if (documentText == null || documentText.isBlank()) {
+            log.warn("extractValueFromDocument: testo documento vuoto per campo={}", fieldName);
             return "Documento non leggibile";
         }
         String prompt = """
@@ -79,6 +83,7 @@ public class ClaudeService {
     }
 
     private String callClaude(String userMessage) {
+        log.debug("callClaude: invio richiesta al modello={} prompt={}chars", model, userMessage.length());
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("model", model);
         body.put("max_tokens", 1024);

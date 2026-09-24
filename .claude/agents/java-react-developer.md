@@ -78,6 +78,40 @@ Applica le correzioni segnalate da ux-tester-elderly, se presenti.
 - ANTHROPIC_API_KEY sempre da variabile d'ambiente
 - Nessun commento nel codice se auto-esplicativo
 
+## Logging obbligatorio (REGOLA NON DEROGABILE)
+Ogni classe `@Service` e `@RestController` DEVE avere `@Slf4j` e log nei punti chiave:
+
+```java
+@Service
+@Slf4j
+public class SomeService {
+
+    public Result doSomething(String input) {
+        log.info("doSomething chiamato con input={}", input);
+        try {
+            Result result = compute(input);
+            log.debug("doSomething completato: result={}", result);
+            return result;
+        } catch (Exception e) {
+            log.error("doSomething fallito per input={}: {}", input, e.getMessage(), e);
+            throw e;
+        }
+    }
+}
+```
+
+**Cosa loggare obbligatoriamente:**
+- `log.info` all'ingresso di ogni metodo pubblico di servizio (parametri non sensibili)
+- `log.info` per ogni operazione completata con successo (upload, salvataggio, conferma step)
+- `log.warn` per casistiche anomale ma non bloccanti (documento già caricato, valore non trovato)
+- `log.error` per ogni eccezione catturata, con stack trace completo
+- MAI loggare password, token JWT, o chiavi API — usa `"[REDACTED]"` se necessario
+
+**NON usare mai:**
+- `System.out.println`
+- `System.err.println`
+- `e.printStackTrace()`
+
 ## Package structure Java
 ```
 app/backend/src/main/java/com/hagenthon/

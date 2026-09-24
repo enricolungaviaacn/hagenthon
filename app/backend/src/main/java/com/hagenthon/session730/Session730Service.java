@@ -39,8 +39,10 @@ public class Session730Service {
 
     @Transactional
     public UploadPdfResponse uploadPdf(User user, MultipartFile file) throws IOException {
+        log.info("uploadPdf: utente={} file={} size={}bytes", user.getEmail(), file.getOriginalFilename(), file.getSize());
         String filePath = saveFile(user.getId(), file);
         String pdfText = pdfAnalyzerService.extractText(filePath);
+        log.debug("uploadPdf: estratto testo di {} caratteri dal PDF", pdfText.length());
         Map<String, String> analyzed = claudeService.analyzePdf730(pdfText);
 
         Session730 session = new Session730();
@@ -49,6 +51,7 @@ public class Session730Service {
         session.setCurrentStepIndex(0);
         session.setStepsData(toJson(analyzed.isEmpty() ? new LinkedHashMap<>() : analyzed));
         session = sessionRepository.save(session);
+        log.info("uploadPdf: sessione creata id={}", session.getId());
 
         session = advanceAutomaticSteps(session);
 
@@ -56,6 +59,7 @@ public class Session730Service {
         String stepName = (idx < TrecentoStep.totalSteps())
                 ? TrecentoStep.byIndex(idx).name()
                 : "COMPLETED";
+        log.info("uploadPdf: primo step={} idx={}", stepName, idx);
         return new UploadPdfResponse(session.getId(), stepName, idx);
     }
 
@@ -106,12 +110,14 @@ public class Session730Service {
 
     @Transactional
     public Map<String, Object> uploadDocument(User user, UUID sessionId, MultipartFile file) throws IOException {
+        log.info("uploadDocument: utente={} sessione={} file={}", user.getEmail(), sessionId, file.getOriginalFilename());
         Session730 session = getSession(user, sessionId);
         if (session.getCurrentStepIndex() >= TrecentoStep.totalSteps()) {
             throw new IllegalArgumentException("Tutti gli step sono già completati");
         }
 
         TrecentoStep step = TrecentoStep.byIndex(session.getCurrentStepIndex());
+        log.info("uploadDocument: step corrente={}", step.name());
         String filePath = saveFile(user.getId(), file);
 
         String docText = pdfAnalyzerService.extractText(filePath);
@@ -133,12 +139,14 @@ public class Session730Service {
         doc.setFilePath(filePath);
         doc.setExtractedValue(extractedValue);
         documentRepository.save(doc);
+        log.info("uploadDocument: valore estratto per step={} value={}", step.name(), extractedValue);
 
         return Map.of("extractedValue", extractedValue, "preview", extractedValue);
     }
 
     @Transactional
     public Map<String, Object> confirmStep(User user, UUID sessionId, String confirmedValue) {
+        log.info("confirmStep: utente={} sessione={} value={}", user.getEmail(), sessionId, confirmedValue);
         Session730 session = getSession(user, sessionId);
         if (session.getCurrentStepIndex() >= TrecentoStep.totalSteps()) {
             throw new IllegalArgumentException("Tutti gli step sono già completati");
@@ -186,10 +194,12 @@ public class Session730Service {
 
     @Transactional
     public SubmitResponse submit(User user, UUID sessionId) {
+        log.info("submit: utente={} sessione={}", user.getEmail(), sessionId);
         Session730 session = getSession(user, sessionId);
         session.setStatus(SessionStatus.COMPLETED);
         session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
+        log.info("submit: sessione {} completata con successo", sessionId);
         return new SubmitResponse("/api/sessions/" + sessionId + "/download");
     }
 
