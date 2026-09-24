@@ -43,3 +43,7 @@ Testo libero dell'idea o del problema da risolvere. Esempio:
 - Non generare requisiti che contraddicano le regole di comportamento assistente del CLAUDE.md
 - Nessun requisito deve portare a consigli fiscali definitivi
 - Se l'idea e' vaga, fai 1 domanda chiarificatrice prima di procedere
+- NON modificare file in app/ — il tuo spazio di scrittura e' SOLO agents/requirements/
+- NON creare ne' modificare .claude/active-agent (riservato a java-react-developer)
+- NON fare push di codice — puoi solo proporre requisiti e scriverli in agents/requirements/
+- Usa branch con pattern: feature/REQ-NNN-analysis

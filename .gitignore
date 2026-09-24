@@ -1,0 +1,15 @@
+# Build
+app/backend/target/
+app/frontend/node_modules/
+app/frontend/dist/
+app/frontend/.vite/
+
+# Runtime
+data/sessions/
+
+# Marker volatile dell'agente attivo (locale, non committare)
+.claude/active-agent
+
+# Environment
+.env
+*.env.local
