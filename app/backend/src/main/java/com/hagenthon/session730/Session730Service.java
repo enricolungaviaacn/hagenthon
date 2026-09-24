@@ -255,7 +255,7 @@ public class Session730Service {
                 : "file";
         String filename = UUID.randomUUID() + "_" + originalName;
         Path dest = dir.resolve(filename);
-        file.transferTo(dest.toFile());
+        file.transferTo(dest.toAbsolutePath().toFile());
         return dest.toAbsolutePath().toString();
     }
 
