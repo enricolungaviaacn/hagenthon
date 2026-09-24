@@ -74,7 +74,38 @@ Copertura minima per metodo: happy path + input vuoto + input non pertinente.
 3. Ritesta solo quella classe: `-Dtest="NomeClasseTest"`
 4. Quando passa, riesegui la suite completa
 
-### 6. Commit e report
+### 6. Build + avvio backend (l'utente lancia solo il frontend)
+Quando tutti i test sono verdi:
+
+```powershell
+# 1. Build backend (senza rieseguire i test)
+$mvn = "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.6\bin\mvn.cmd"
+& $mvn package -DskipTests -q `
+    -f "C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup\app\backend\pom.xml"
+
+# 2. Build frontend (verifica TypeScript)
+cd "C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup\app\frontend"
+npm run build
+
+# 3. Libera la porta 8080 se occupata dal processo precedente
+$old = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue |
+       Select-Object -ExpandProperty OwningProcess -First 1
+if ($old) { Stop-Process -Id $old -Force }
+
+# 4. Avvia il backend in background (l'utente non deve farlo)
+$env:JAVA_HOME  = "C:\Program Files\Microsoft\jdk-21.0.12.101-hotspot"
+$env:MAIL_HOST  = "smtp.gmail.com"
+$env:MAIL_USERNAME = "test@test.com"
+$env:MAIL_PASSWORD = "testpass"
+Start-Process -FilePath $mvn `
+    -ArgumentList "spring-boot:run","-f","C:\Users\giuliana.russo\AppData\Local\Temp\hagenthon-setup\app\backend\pom.xml" `
+    -WindowStyle Hidden
+Write-Host "Backend avviato su porta 8080. Lancia solo: npm run dev"
+```
+
+Se la build fallisce (Java o TypeScript), correggilo prima di committare.
+
+### 7. Commit e report
 ```bash
 git add app/backend/src/test/
 git commit -m "test: copertura [NomeClasse] dopo commit [hash-breve]"
@@ -90,6 +121,8 @@ Report JSON verso agent-lead:
     "total_tests": 65,
     "passed": 65,
     "failed": 0,
+    "build_backend": "SUCCESS",
+    "build_frontend": "SUCCESS",
     "new_tests_added": ["DocumentDataExtractorTest"],
     "fixes_applied": [
       { "file": "DocumentDataExtractor.java", "issue": "regex non trova decimali con virgola", "fix": "pattern aggiornato a (\\d[\\d.,]+)" }
