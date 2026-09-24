@@ -1,100 +1,139 @@
 # Flusso Agentico — 730 Facile
 
-## Flusso Applicativo (Runtime)
+## Principio architetturale
+L'Orchestratore e' il centro di tutte le comunicazioni. Nessun agente comunica direttamente
+con un altro agente: tutto passa attraverso l'Orchestratore, che decide cosa fare dopo ogni
+risposta e a quale agente passare il controllo.
 
 ```
-Utente carica PDF 730
+                    [ORCHESTRATORE - Sonnet]
+                    Legge CLAUDE.md all'avvio
+                           |
+          _________________|_________________
+         |          |          |             |
+         v          v          v             v
+    [Runtime]  [Funzionale] [Tecnico]   [UX Tester]
+    pdf-analyzer requirements java-react  ux-tester
+    doc-compar  definer/Opus  developer   elderly
+    memory-mgr  req-analyzer  Sonnet      Sonnet
+                Opus
+```
+
+---
+
+## Flusso 1: Workflow di Sviluppo (Development)
+
+```
+ORCHESTRATORE riceve richiesta di nuova feature dal team
+        |
+        | legge CLAUDE.md per verificare coerenza
+        v
+[requirements-definer / Opus]
+  Produce: user story + mockup testuale + voce di Maria
+           + scenario fallimento + impatto 5 voci + stima token
+        |
+        | Orchestratore valida l'output e lo passa all'analisi
+        v
+[requirement-analyzer / Opus]
+  Produce: edge cases + dipendenze + lista JUnit obbligatoria
+           + impatto agenti + domande aperte
+        |
+        | Revisione umana del team (OK o modifica)
+        v
+[java-react-developer / Sonnet]
+  STEP 1: Scrive test JUnit per TUTTI i casi (lista da requirement-analyzer)
+          -> git commit su feature/REQ-NNN-step1-tests
+          -> PR su test (hook blocca push diretto)
+          -> Orchestratore notifica team: "PR pronta per review"
+
+  STEP 2: Implementa codice backend (Spring Boot)
+          -> git commit su feature/REQ-NNN-step2-backend
+          -> PR su test
+
+  STEP 3: Implementa codice frontend (React)
+          -> git commit su feature/REQ-NNN-step3-frontend
+          -> PR su test
+        |
+        | Orchestratore passa ogni step a UX Tester
+        v
+[ux-tester-elderly / Sonnet]
+  Simula Maria su mockup testuale (STEP 1) e implementazione reale (STEP 2/3)
+  Segnala: problemi bloccanti / fastidiosi / miglioramenti
+        |
+        | Orchestratore raccoglie feedback e decide se iterare o procedere
+        v
+  Fix problemi UX -> nuovo commit -> nuova PR
         |
         v
-[Orchestratore - Sonnet]
-  Valida upload, avvia sessione
+  PR approvata: test -> stable -> main
+```
+
+---
+
+## Flusso 2: Runtime Applicativo (Conversazione con Maria)
+
+```
+Maria carica il PDF del 730
         |
         v
-[pdf-analyzer - Haiku]
-  Estrae testo e coordinate delle 5 voci
-  Output: JSON con valori e posizioni bbox
+ORCHESTRATORE
+  Legge CLAUDE.md, carica sessione via memory-manager
+  Mostra disclaimer CAF obbligatorio
         |
         v
-[Orchestratore]
-  Seleziona la prima voce da analizzare
-  Spiega la voce a Maria in linguaggio semplice
-  Chiede il documento di verifica
+[pdf-analyzer / Haiku]
+  Estrae le 5 voci con coordinate bbox
+  Output: JSON strutturato con posizioni
         |
         v
-[memory-manager - Haiku]
-  Controlla se il documento e' gia' stato caricato
-  Aggiorna lo stato della sessione
+ORCHESTRATORE
+  Per ogni voce (in sequenza):
+  1. Spiega la voce in linguaggio semplice
+  2. Invia bbox al frontend -> highlight PDF.js (pulsante "Mostra nel documento")
+  3. Controlla via memory-manager se il documento e' gia' stato caricato
+  4. Chiede il valore dal documento di verifica
         |
         v
-  Utente inserisce il valore dal documento
-        |
-        v
-[document-comparator - Haiku]
+[document-comparator / Haiku]
   Confronta valore utente vs valore 730
-  Risponde OK o ATTENZIONE in linguaggio semplice
+  Output: OK / ATTENZIONE / ESCALATION_CAF (dopo 3 tentativi)
         |
         v
-[Orchestratore]
-  Se tentativi >= 3 per questa voce -> ESCALATION CAF
-  Se OK o ATTENZIONE accettata -> voce successiva
+[memory-manager / Haiku]
+  Salva risultato voce, aggiorna tentativi
+  Se tutte le voci completate: genera riepilogo finale
         |
         v
-  Tutte le voci completate?
-   NO -> torna a seleziona voce
-   SI  -> [memory-manager] genera riepilogo finale
-        |
-        v
-  Mostra riepilogo a Maria
+ORCHESTRATORE
+  Presenta risultato a Maria
+  Se ESCALATION_CAF: suggerisce CAF, passa alla voce successiva
+  Se tutte le voci finiscono: mostra riepilogo e chiude la sessione
 ```
 
-## Flusso di Sviluppo (Development Workflow)
-
-```
-Idea nuova feature o problema segnalato
-        |
-        v
-[requirements-definer - Opus 5.5]
-  Struttura il requisito in user story
-  Propone varianti e feature correlate
-  Output: JSON REQ-NNN con criteri accettazione
-        |
-        v
-[requirement-analyzer - Opus 5.5]
-  Analizza edge cases e dipendenze
-  Genera lista test_cases_junit
-  Identifica impatto su agenti esistenti
-  Output: analisi dettagliata con domande aperte
-        |
-        v
-  Revisione umana (sviluppatore)
-  Risposta alle domande aperte
-        |
-        v
-[java-react-developer - Sonnet 4.6]
-  PRIMA: scrive test JUnit per tutti i casi
-  POI: implementa il codice
-  Verifica: ./mvnw test (tutti i test devono passare)
-        |
-        v
-[ux-tester-elderly - Sonnet 4.6]
-  Simula Maria che usa la nuova feature
-  Segnala confusioni e blocchi
-  Output: lista problemi con priorita
-        |
-        v
-  Revisione umana + fix problemi segnalati
-  (ciclo java-react-developer <-> ux-tester-elderly)
-        |
-        v
-  git commit su feature/nome-requisito
-  Pull Request su test (hook blocca push diretto)
-        |
-        v
-  PR approvata -> test -> stable -> main
-```
+---
 
 ## Regole di Escalation
-- Max 3 tentativi per voce -> suggerisci CAF
-- PDF non riconoscibile come 730 -> messaggio chiaro + stop
-- Errore API Claude -> fallback su messaggio di attesa
-- Sessione interrotta -> ripristino automatico da session_state.json
+
+| Condizione | Azione Orchestratore |
+|------------|---------------------|
+| Tentativi >= 3 per una voce | Suggerisce CAF per quella voce, avanza |
+| PDF non riconosciuto come 730 | Messaggio semplice, chiede di ricaricare |
+| Errore API Claude | Messaggio generico, riprova automaticamente |
+| Sessione interrotta | Ripristino automatico da session_state.json |
+| Domanda fiscale definitiva | Rimanda sempre al CAF, non risponde |
+
+---
+
+## Struttura PR per step (Development)
+
+Ogni requisito viene sviluppato in PR separate e sequenziali:
+
+```
+feature/REQ-001-step1-junit-tests    -> PR su test (solo test JUnit)
+feature/REQ-001-step2-backend        -> PR su test (implementazione Java)
+feature/REQ-001-step3-frontend       -> PR su test (componenti React)
+feature/REQ-001-step4-ux-fixes       -> PR su test (fix da ux-tester-elderly)
+```
+
+Ogni PR deve passare tutti i test prima di essere approvata.
+La promozione avviene: test -> stable -> main (sempre via PR, mai push diretto).
