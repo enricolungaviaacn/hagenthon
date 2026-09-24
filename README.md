@@ -100,6 +100,7 @@ feature/nome <- Sviluppo attivo
 | check-read-path | Read, Edit, Write | Blocca accesso a file fuori dal repo |
 | check-branch | Bash (git push/merge) | Blocca push diretti su main/stable/test |
 | check-db-access | Bash, Edit, Write | Blocca modifiche DB per non-sviluppatori |
+| check-agent-role | Edit, Write, Bash | Solo java-react-developer scrive in app/ e pusha codice; gli agenti funzionali scrivono solo in agents/requirements/ |
 
 ---
 

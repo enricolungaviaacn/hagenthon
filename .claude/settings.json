@@ -20,6 +20,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/check-db-access.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-agent-role.sh"
           }
         ]
       },
@@ -33,6 +37,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/check-db-access.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-agent-role.sh"
           }
         ]
       },
@@ -46,6 +54,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/check-db-access.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/check-agent-role.sh"
           }
         ]
       }

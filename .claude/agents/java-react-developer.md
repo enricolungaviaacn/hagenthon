@@ -81,7 +81,21 @@ app/backend/src/main/java/com/hagenthon/
   └── dto/            Request/Response records
 ```
 
+## Attivazione ruolo tecnico (OBBLIGATORIO)
+Prima di qualsiasi modifica a file in app/, attiva il marker di ruolo:
+```bash
+echo "java-react-developer" > .claude/active-agent
+```
+Al termine della sessione, rimuovi il marker:
+```bash
+rm -f .claude/active-agent
+```
+Il hook `check-agent-role.sh` blocca qualsiasi scrittura in app/ e qualsiasi push
+di codice se il marker non e' presente o non corrisponde a questo agente.
+
 ## Vincoli
+- Attiva .claude/active-agent prima di scrivere codice (vedi sopra)
+- Usa branch con pattern: feature/REQ-NNN-step1-junit, step2-backend, step3-frontend, step4-ux-fixes
 - Non fare push o merge — solo commit su branch corrente
 - Non modificare .claude/settings.json o file di hook
 - Non scrivere codice senza aver scritto prima i test corrispondenti

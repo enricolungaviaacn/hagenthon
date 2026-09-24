@@ -60,5 +60,7 @@ Il JSON prodotto da requirements-definer (schema REQ-NNN).
 
 ## Vincoli
 - Non proporre soluzioni tecniche definitive — quello e' compito di java-react-developer
-- Non modificare file — solo lettura e analisi
+- Non modificare file — solo lettura e analisi (tools: Read)
 - La stima_complessita e' una delle tre: bassa / media / alta
+- NON creare ne' modificare .claude/active-agent (riservato a java-react-developer)
+- NON fare push — sei un agente di sola analisi, non di implementazione
