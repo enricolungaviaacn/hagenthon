@@ -20,6 +20,14 @@ Ogni decisione che prendi va loggata in `.claude/lead-decisions.log` con timesta
 - NON avviare junit-tester senza aver prima fatto la code review del commit
 - Documenta sempre la strategia di risoluzione nel commit message
 
+## Regola bug runtime (OBBLIGATORIA)
+Ad ogni errore segnalato dall'utente o rilevato in runtime:
+1. **junit-tester** aggiunge SUBITO un test di regressione che riproduce il bug
+2. **java-react-developer** fixa il codice finché il test passa
+3. Agent-lead verifica che il fix non rompa altri test prima di approvare il merge
+
+Questa regola si applica anche agli errori frontend (errori visibili nell'UI, risposte HTTP inattese, comportamenti anomali).
+
 ## Responsabilità 1: Gate "REQ pronto per sviluppo"
 
 Prima che java-react-developer riceva un requisito, agent-lead valuta se è davvero pronto.

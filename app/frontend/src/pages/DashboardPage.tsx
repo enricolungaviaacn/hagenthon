@@ -15,7 +15,7 @@ function statusLabel(status: Session['status']) {
   switch (status) {
     case 'IN_PROGRESS': return 'In corso';
     case 'COMPLETED': return 'Completato';
-    case 'SUBMITTED': return 'Inviato';
+    default: return status;
   }
 }
 
@@ -23,7 +23,7 @@ function statusClass(status: Session['status']) {
   switch (status) {
     case 'IN_PROGRESS': return 'status-in-progress';
     case 'COMPLETED': return 'status-completed';
-    case 'SUBMITTED': return 'status-submitted';
+    default: return '';
   }
 }
 

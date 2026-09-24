@@ -64,5 +64,5 @@ export const getDocuments = async (): Promise<Document[]> => {
  * Il token JWT viene aggiunto automaticamente dall'interceptor axios.
  */
 export const getPdfUrl = (sessionId: string): string => {
-  return `http://localhost:8080/api/sessions/${sessionId}/pdf`;
+  return `/api/sessions/${sessionId}/pdf`;
 };
